@@ -1,6 +1,7 @@
 export type Repository = {
   id: string; // URL を ID として使うことが一般的なので、string 型としています
   org: string;
+  avatarURL: string;
   name: string;
   url: string;
   lang: string;
@@ -32,11 +33,13 @@ export type QuestionData = {
 };
 
 export type Answer = {
-    user_id: string;
-    user_answer: string;
-    correct_answer: string;
-    is_correct: boolean;
-}
+  user_id: string;
+  user_answer: string;
+  correct_answer: string;
+  repo_image_url: string;
+  repo_url: string;
+  is_correct: boolean;
+};
 
 export type Round = {
   id: number;
