@@ -98,6 +98,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       name: randomRepo.name,
       url: randomRepo.url,
       lang: randomRepo.lang,
+      desc: randomRepo.desc,
       star_num: randomRepo.star_num,
       fork_num: randomRepo.fork_num,
       snippets: randomRepo.snippets,

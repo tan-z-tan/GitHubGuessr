@@ -1,10 +1,18 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Answer } from "../types";
 
 const Home: NextPage = () => {
-  const [history, setHistory] = useState([]); // ゲームの履歴を保持
+  const [answerLog, setAnswerLog] = useState<Answer[]>([]);
+
+  useEffect(() => {
+    const answerLog = JSON.parse(localStorage.getItem("answerLog") || "[]");
+    if (answerLog.length) {
+      setAnswerLog(answerLog);
+    }
+  }, []);
 
   function startGame() {
     // ゲーム開始時にanswerLogをリセット
@@ -59,11 +67,26 @@ const Home: NextPage = () => {
         >
           Start Game
         </motion.button>
-        {history.length > 0 /* 履歴があれば表示 */ && (
+        {answerLog.length > 0 /* 履歴があれば表示 */ && (
           <div>
-            <h2>Hisotry</h2>
-            {history.map((game, index) => (
-              <div key={index}>{/* game の詳細を表示 */}</div>
+            <h2 className="text-black font-bold text-lg mt-12 mb-3 mx-3">Your previous score</h2>
+            {answerLog.map((answer, index) => (
+              <div key={index} className="mb-2 text-left">
+                {index + 1}:
+                <span
+                  className={
+                    answer.is_correct ? "text-green-500" : "text-red-500"
+                  }
+                >
+                  {answer.is_correct ? " Correct! " : " Wrong. "}
+                </span>
+                <img
+                  src={answer.repo_image_url}
+                  className="w-6 h-6"
+                  style={{ display: "inline-block" }}
+                />
+                "{answer.correct_answer}"
+                  </div>
             ))}
           </div>
         )}

@@ -5,6 +5,7 @@ export type Repository = {
   name: string;
   url: string;
   lang: string;
+  desc: string;
   star_num: number;
   fork_num: number;
   snippets: string[];

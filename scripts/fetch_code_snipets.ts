@@ -1,11 +1,10 @@
-import fs from 'fs';
+import fs from "fs";
 import axios from "axios";
 import { Repository } from "../types";
-// const githubPopularRpoes = require("../data/github_repos").githubPopularRpoes;
 import { githubPopularRepos } from "../data/github_repos";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
-dotenv.config();  // .envの内容をprocess.envに反映
+dotenv.config(); // .envの内容をprocess.envに反映
 
 const EXT_BY_LANG: { [key: string]: string } = {
   TypeScript: ".ts",
@@ -45,6 +44,40 @@ const GITHUB_API_URL = "https://api.github.com";
 const SNIPPETS = 10;
 const MAX_LINE = 64;
 
+async function selectRandomSnippet(repoName: string, files: any[]) {
+  // 基準を満たすファイルが見つからない場合は10回までリトライ
+  for (let retry = 0; retry < 10; retry++) {
+    const randomIndex = Math.floor(Math.random() * files.length);
+    const f = files[randomIndex];
+
+    if (!f) {
+      continue;
+    }
+    const response = await axios.get(
+      `${GITHUB_API_URL}/repos/${repoName}/contents/${f.path}`,
+      { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } }
+    );
+    // Base64デコードして内容を取得
+    const content = Buffer.from(response.data.content, "base64").toString(
+      "utf-8"
+    );
+    const lines = content.split("\n");
+    // line が10行未満の場合はリトライ
+    if (lines.length < 10) {
+      continue;
+    }
+
+    // ファイルのランダムな部分を取得
+    const randomStart = Math.floor(Math.random() * (lines.length - MAX_LINE));
+    const snippet = content
+      .split("\n")
+      .slice(randomStart, randomStart + MAX_LINE)
+      .join("\n");
+    return snippet;
+  }
+  return undefined;
+}
+
 async function getRandomSnippetsFromRepo(
   repoName: string,
   defaultBranch: string,
@@ -62,34 +95,16 @@ async function getRandomSnippetsFromRepo(
   const tree = response.data.tree;
   const fileExts = langs.map((lang) => EXT_BY_LANG[lang]).filter((ext) => ext);
   const files = tree.filter(
-    (item: any) => item.type === "blob" && fileExts.some((ext) => item.path.endsWith(ext))
+    (item: any) =>
+      item.type === "blob" && fileExts.some((ext) => item.path.endsWith(ext))
   );
 
   const randomSnippets: string[] = [];
   for (let i = 0; i < SNIPPETS; i++) {
-    const randomIndex = Math.floor(Math.random() * files.length);
-    const f = files[randomIndex];
-    console.log("random file", f);
-    if (!f) {
+    const snippet = await selectRandomSnippet(repoName, files);
+    if (!snippet) {
       continue;
     }
-    const response = await axios.get(
-      `${GITHUB_API_URL}/repos/${repoName}/contents/${f.path}`,
-      { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } }
-    );
-    // Base64デコードして内容を取得
-    const content = Buffer.from(response.data.content, "base64").toString(
-      "utf-8"
-    );
-
-    // ファイルのランダムな部分を取得
-    const lines = content.split("\n");
-    const randomStart = Math.floor(Math.random() * (lines.length - MAX_LINE));
-    const snippet = content
-      .split("\n")
-      .slice(randomStart, randomStart + MAX_LINE)
-      .join("\n");
-
     randomSnippets.push(snippet);
   }
   return randomSnippets;
@@ -130,14 +145,18 @@ async function fetchSnippetsForRepos() {
       name: repo.name,
       url: githubURL,
       lang: repo.lang,
+      desc: repo.desc,
       star_num: starCount,
       fork_num: flakCount,
       snippets: snippets,
     });
   }
 
-  // JSON形式で保存
-  fs.writeFileSync('./data/repo_with_snippets.json', JSON.stringify(output, null, 2));
+  // Typescript形式で保存。このデータを pages/api/question.tsで利用する。
+  fs.writeFileSync(
+    "./data/repo_with_snippets.ts",
+    "export const githubPopularRepos = " + JSON.stringify(output, null, 2) + ";"
+  );
   console.log(JSON.stringify(output, null, 2));
 }
 

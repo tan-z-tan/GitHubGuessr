@@ -258,7 +258,7 @@ export const githubPopularRepos = [
   },
   {
     name: "rollup/rollup",
-    lang: "JavaScript",
+    lang: "JavaScript, TypeScript",
     desc: "Next-generation ES module bundler.",
   },
   {

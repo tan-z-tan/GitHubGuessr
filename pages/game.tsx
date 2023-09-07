@@ -1,6 +1,7 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import { Answer, QuestionData } from "../types";
 import { motion, useAnimation } from "framer-motion";
+import Autocomplete from "react-select";
 
 export default function Game() {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(
@@ -9,17 +10,21 @@ export default function Game() {
   const [answer, setAnswer] = useState("");
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0); // 現在の質問のインデックス
+  const [snippetIndex, setSnippetIndex] = useState(0); // 現在のスニペットのインデックス
   const [showModal, setShowModal] = useState(false); // モーダルの表示フラグ
   const [answerable, setAnswerable] = useState(false); // 回答可能かどうか
   const snipetControls = useAnimation();
+  const snipetDragControls = useAnimation();
   const modalControls = useAnimation();
-  const gameRound = 4; // ゲームのラウンド数
-  
+  const gameRound = 10; // ゲームのラウンド数
+  const dragParentRef = useRef<HTMLDivElement>(null);
+  const dragAreaRef = useRef<HTMLPreElement>(null);
+
   useEffect(() => {
     const answerLog = JSON.parse(localStorage.getItem("answerLog") || "[]");
     if (answerLog.length) {
-        setAnswerLog(answerLog);
-        setQuestionIndex(answerLog.length);
+      setAnswerLog(answerLog);
+      setQuestionIndex(answerLog.length);
     }
 
     fetchQuestion();
@@ -29,8 +34,25 @@ export default function Game() {
     const response = await fetch("/api/question");
     const data: QuestionData = await response.json();
     snipetControls.start({ scale: [0.1, 1] });
+    snipetDragControls.start({ x: 0, y: 0 });
     setCurrentQuestion(data);
     setAnswerable(true);
+  }
+
+  function nextSnippet(dir: number = 1) {
+    return () => {
+      if (!currentQuestion) return;
+
+      const nextIndex = snippetIndex + dir;
+      if (nextIndex < 0) {
+        setSnippetIndex(currentQuestion.repository.snippets.length - 1);
+      } else if (nextIndex < currentQuestion.repository.snippets.length) {
+        setSnippetIndex(nextIndex);
+      } else {
+        setSnippetIndex(0);
+      }
+      snipetDragControls.start({ x: 0, y: 0 });
+    };
   }
 
   return (
@@ -51,11 +73,12 @@ export default function Game() {
       <motion.div
         animate={snipetControls}
         transition={{ ease: "easeInOut", delay: 0.3, duration: 0.5 }}
-        style={{ scale: 0.1 }}
-        className="w-5/6 md:max-w-xl bg-white rounded-full position-relative overflow-hidden aspect-square"
+        style={{ scale: 0.1, boxShadow: "0px 0px 20px 16px rgba(0, 0, 0, 0.4)" }}
+        className="w-5/6 md:max-w-xl bg-white rounded-full relative overflow-hidden aspect-square"
       >
         <div
           className="relative flex justify-center items-center"
+          ref={dragParentRef}
           style={{
             background: "white",
             aspectRatio: 1,
@@ -65,22 +88,63 @@ export default function Game() {
             alignItems: "center",
           }}
         >
-          <motion.pre drag className="font-mono text-sm">
-            {currentQuestion?.repository.snippets[0]}
+          <motion.pre
+            drag
+            dragConstraints={dragParentRef}
+            animate={snipetDragControls}
+            ref={dragAreaRef}
+            className="font-mono text-sm"
+          >
+            {currentQuestion?.repository.snippets[snippetIndex]}
           </motion.pre>
         </div>
       </motion.div>
-      <input
-        type="text"
-        value={answer}
-        disabled={!answerable}
-        onChange={(e) => setAnswer(e.target.value)}
-        // enterキーで回答
-        onKeyDown={(e) => {
-          if (e.key === "Enter") checkAnswer();
+      <div className="relative w-5/6 md:max-w-xl">
+        <motion.div
+          className="absolute w-8 h-8 text-white cursor-pointer text-4xl font-bold"
+          whileHover={{ scale: 1.2 }}
+          style={{ left: "12%", bottom: "36px" }}
+          onClick={nextSnippet(-1)}
+        >
+          {"←"}
+        </motion.div>
+      </div>
+      {/* 次のSnippetを表示するためのコンポーネント */}
+      <div className="relative w-5/6 md:max-w-xl">
+        <motion.div
+          className="absolute w-8 h-8 text-white cursor-pointer text-4xl font-bold"
+          whileHover={{ scale: 1.2 }}
+          style={{ right: "12%", bottom: "36px" }}
+          onClick={nextSnippet()}
+        >
+          {"→"}
+        </motion.div>
+      </div>
+      <Autocomplete
+        className="w-80 rounded-full bg-gray-200 px-4 py-0 mt-2 mb-4"
+        styles={{
+          control: (baseStyles, state) => ({
+            ...baseStyles,
+            borderColor: "None",
+            backgroundColor: "transparent",
+            "&:hover": {
+              borderColor: "None",
+            },
+            "&:focus": {
+              borderColor: "None",
+            },
+            "&:active": {
+              borderColor: "None",
+            },
+          }),
         }}
-        placeholder="リポジトリ名を入力"
-        className="bg-gray-200 rounded-full px-4 py-2 mt-4 w-80 text-center mb-4"
+        defaultValue={null}
+        onChange={(selected) => {
+          if (selected) setAnswer(selected.value);
+        }}
+        options={currentQuestion?.candidates.map((candidate) => {
+          return { value: candidate, label: candidate };
+        })}
       />
       <button
         className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full"
@@ -98,7 +162,6 @@ export default function Game() {
             >
               {answer.is_correct ? " Correct! " : " Wrong. "}
             </span>
-            Your answer was "{answer.user_answer}"
             <br />
             Correct answer{" "}
             <img
@@ -107,6 +170,8 @@ export default function Game() {
               style={{ display: "inline-block" }}
             />
             "{answer.correct_answer}"
+            <br />
+            Your answer is "{answer.user_answer}"
           </div>
         ))}
       </div>
@@ -128,17 +193,20 @@ export default function Game() {
               ? "You win!🎉"
               : "You lose😢"}
           </p>
-          <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
-            Your Answer: "{answer}"
-          </p>
-          <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
-            Correct Answer:
+          <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6 border-b-2 border-gray-200 pb-2">
+            The repository is {" "}
             <img
               src={currentQuestion?.repository.avatarURL}
               className="w-10 h-10"
               style={{ display: "inline-block" }}
             />
-            "{currentQuestion?.repository.name}"
+            {currentQuestion?.repository.name}
+            <p className="text-gray-300 font-normal text-sm max-w-md mx-auto my-2">
+              {currentQuestion?.repository.desc}
+            </p>
+          </p>
+          <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
+            Your Answer is "{answer}"
           </p>
           <motion.button
             whileHover={{ scale: 1.06 }}
