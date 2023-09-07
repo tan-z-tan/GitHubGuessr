@@ -76,10 +76,10 @@ export default function Game() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-700">
-      <div className={"text-lg mb-4 font-bold absolute top-0 right-0 mt-3 mr-4 " + (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")}>
+      <div className={"text-lg w-full md:max-w-lg text-right font-bold mr-4 " + (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")}>
         {secondsRemaining}s
       </div>
-      <h2 className="text-white text-2xl font-bold mb-4 mt-8">
+      <h2 className="text-white text-2xl font-bold mb-4">
         What is this repository? {questionIndex + 1}/{gameRound}
       </h2>
       <div className="text-white text-md mb-4">
@@ -99,7 +99,7 @@ export default function Game() {
           scale: 0.1,
           boxShadow: "0px 0px 20px 16px rgba(0, 0, 0, 0.4)",
         }}
-        className="w-5/6 md:max-w-xl bg-white rounded-full relative overflow-hidden aspect-square"
+        className="w-11/12 md:max-w-xl bg-white rounded-full relative overflow-hidden aspect-square"
       >
         <div
           className="relative flex justify-center items-center"
