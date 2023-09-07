@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Answer } from "../types";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { start } from "repl";
 
 export default function Result() {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
@@ -15,29 +16,30 @@ export default function Result() {
     if (savedLog.length) setAnswerLog(savedLog);
   }, []);
 
-  function calculateScore(log: Answer[]) {
-    const correctAnswers = log.filter((item) => item.is_correct).length;
-    setScore(correctAnswers);
+  function startGame() {
+    // ゲーム開始時にanswerLogをリセット
+    localStorage.removeItem("answerLog");
+    window.location.href = "/game";
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 px-2">
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 px-2 overflow-wrap">
       <h1 className="text-4xl font-bold mb-4">
         Your Score: {score}/{answerLog.length}
       </h1>
       <table className="table-auto border-collapse border border-indigo-500 my-6">
-        <thead>
+        <thead className="text-gray-500">
           <tr>
-            <th className="border border-indigo-500 px-4 py-2 text-gray-600">
-              Round
+            <th className="border border-indigo-500 px-4 py-2">
+              
             </th>
-            <th className="border border-indigo-500 px-4 py-2 text-gray-600">
+            <th className="border border-indigo-500 px-4 py-2">
               Your Answer
             </th>
-            <th className="border border-indigo-500 px-4 py-2 text-gray-600">
-              Correct Answer
+            <th className="border border-indigo-500 px-4 py-2">
+              Answer
             </th>
-            <th className="border border-indigo-500 px-4 py-2 text-gray-600">
+            <th className="border border-indigo-500 px-4 py-2">
               Result
             </th>
           </tr>
@@ -53,7 +55,7 @@ export default function Result() {
               </td>
               <td className="border border-indigo-500 px-4 py-2">
                 <a href={answer.repo_url} target="_blank">
-                  {answer.correct_answer}
+                  {answer.correct_answer.split("/")[1]}
                 </a>
               </td>
               <td
@@ -62,7 +64,7 @@ export default function Result() {
                   (answer.is_correct ? " text-green-500" : " text-red-500")
                 }
               >
-                {answer.is_correct ? "Correct!" : "Wrong"}
+                {answer.is_correct ? "Correct" : "Wrong"}
               </td>
             </tr>
           ))}
@@ -72,7 +74,7 @@ export default function Result() {
         className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full mt-4"
         whileHover={{ scale: 1.06 }}
         transition={{ duration: 0.4, ease: "easeInOut" }}
-        onClick={() => (window.location.href = "/game")}
+        onClick={startGame}
       >
         Play Again
       </motion.button>

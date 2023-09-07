@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Answer, QuestionData } from "../types";
 import { motion, useAnimation } from "framer-motion";
 
@@ -13,17 +13,14 @@ export default function Game() {
   const [answerable, setAnswerable] = useState(false); // 回答可能かどうか
   const snipetControls = useAnimation();
   const modalControls = useAnimation();
-  const gameRount = 4; // ゲームのラウンド数
-
+  const gameRound = 4; // ゲームのラウンド数
+  
   useEffect(() => {
-    console.log("useEffect", questionIndex);
-    // ゲーム開始時にanswerLogをリセット
-    if (questionIndex === 0) {
-      localStorage.removeItem("answerLog");
-    }
-
     const answerLog = JSON.parse(localStorage.getItem("answerLog") || "[]");
-    if (answerLog.length) setAnswerLog(answerLog);
+    if (answerLog.length) {
+        setAnswerLog(answerLog);
+        setQuestionIndex(answerLog.length);
+    }
 
     fetchQuestion();
   }, [questionIndex]);
@@ -39,13 +36,23 @@ export default function Game() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-700">
       <h2 className="text-white text-2xl font-bold mb-4">
-        What is this repository?
+        What is this repository? {questionIndex + 1}/{gameRound}
       </h2>
+      <div className="text-white text-md mb-4">
+        <span className="font-bold">
+          {currentQuestion?.repository.star_num}
+        </span>
+        {" stars, "}
+        <span className="font-bold">
+          {currentQuestion?.repository.fork_num}
+        </span>
+        {" forks"}
+      </div>
       <motion.div
         animate={snipetControls}
         transition={{ ease: "easeInOut", delay: 0.3, duration: 0.5 }}
         style={{ scale: 0.1 }}
-        className="max-w-600 w-5/6 bg-white rounded-full position-relative overflow-hidden aspect-square"
+        className="w-5/6 md:max-w-xl bg-white rounded-full position-relative overflow-hidden aspect-square"
       >
         <div
           className="relative flex justify-center items-center"
@@ -59,7 +66,7 @@ export default function Game() {
           }}
         >
           <motion.pre drag className="font-mono text-sm">
-            {currentQuestion?.codeSnippets[0]?.code}
+            {currentQuestion?.repository.snippets[0]}
           </motion.pre>
         </div>
       </motion.div>
@@ -133,12 +140,14 @@ export default function Game() {
             />
             "{currentQuestion?.repository.name}"
           </p>
-          <button
-            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full"
+          <motion.button
+            whileHover={{ scale: 1.06 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="bg-indigo-400 hover:bg-indigo-500 text-white font-bold mt-6 py-2 px-4 rounded-full"
             onClick={goToNextQuestion}
           >
-            {questionIndex === gameRount - 1 ? "Show Result" : "Next Question"}
-          </button>
+            {questionIndex >= gameRound - 1 ? "Show Result" : "Next Quize"}
+          </motion.button>
         </motion.div>
       )}
     </div>
@@ -172,7 +181,7 @@ export default function Game() {
   }
 
   function goToNextQuestion() {
-    if (questionIndex === gameRount - 1) {
+    if (questionIndex >= gameRound - 1) {
       // スコアをLocalStorageに保存
       const existingLogs: Answer[] = JSON.parse(
         localStorage.getItem("answerLog") || "[]"

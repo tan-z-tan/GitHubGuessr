@@ -6,14 +6,8 @@ export type Repository = {
   url: string;
   lang: string;
   star_num: number;
-  folk_num: number;
-};
-
-export type CodeSnippet = {
-  id: number;
-  repository_id: string; // Repository の id と紐づけるので、string 型
-  lang: string;
-  code: string;
+  fork_num: number;
+  snippets: string[];
 };
 
 export type Theme = {
@@ -29,7 +23,7 @@ export type ThemeRepository = {
 
 export type QuestionData = {
   repository: Repository;
-  codeSnippets: CodeSnippet[]; // 複数のスニペットを持つ配列
+  candidates: string[];
 };
 
 export type Answer = {

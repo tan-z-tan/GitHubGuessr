@@ -1,59 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { QuestionData } from "../../types";
 import axios from "axios";
-
-const repos = [
-  {
-    name: "torvalds/linux",
-    url: "https://github.com/torvalds/linux",
-    lang: "C",
-  },
-  {
-    name: "microsoft/vscode",
-    url: "https://github.com/microsoft/vscode",
-    lang: "TypeScript",
-  },
-  {
-    name: "facebook/react",
-    url: "https://github.com/facebook/react",
-    lang: "JavaScript",
-  },
-  {
-    name: "angular/angular",
-    url: "https://github.com/angular/angular",
-    lang: "TypeScript",
-  },
-  {
-    name: "tensorflow/tensorflow",
-    url: "https://github.com/tensorflow/tensorflow",
-    lang: "Python",
-  },
-  {
-    name: "kubernetes/kubernetes",
-    url: "https://github.com/kubernetes/kubernetes",
-    lang: "Go",
-  },
-  {
-    name: "docker/docker-ce",
-    url: "https://github.com/docker/docker-ce",
-    lang: "Go",
-  },
-  {
-    name: "nodejs/node",
-    url: "https://github.com/nodejs/node",
-    lang: "JavaScript",
-  },
-  {
-    name: "npm/cli",
-    url: "https://github.com/npm/cli",
-    lang: "JavaScript",
-  },
-  {
-    name: "yarnpkg/yarn",
-    url: "https://github.com/yarnpkg/yarn",
-    lang: "JavaScript",
-  },
-];
+import { githubPopularRepos } from "../../data/repo_with_snippets";
 
 const EXT_BY_LANG: { [key: string]: string } = {
   TypeScript: ".ts",
@@ -91,6 +39,7 @@ const EXT_BY_LANG: { [key: string]: string } = {
 };
 const GITHUB_API_URL = "https://api.github.com";
 const SNIPETS = 1;
+const MAX_LINE = 64;
 
 async function getRandomSnipetsFromRepo(
   owner: string,
@@ -123,8 +72,13 @@ async function getRandomSnipetsFromRepo(
       "utf-8"
     );
 
-    // 簡単のため、ファイルの最初の10行をスニペットとして取得
-    const snippet = content.split("\n").slice(0, 32).join("\n");
+    // ファイルのランダムな部分を取得
+    const lines = content.split("\n");
+    const randomStart = Math.floor(Math.random() * (lines.length - MAX_LINE));
+    const snippet = content
+      .split("\n")
+      .slice(randomStart, randomStart + MAX_LINE)
+      .join("\n");
 
     randomSnipets.push(snippet);
   }
@@ -133,50 +87,22 @@ async function getRandomSnipetsFromRepo(
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   // ここでランダムにリポジトリを選択して、そのリポジトリの情報を返す
-  const randomRepo = repos[Math.floor(Math.random() * repos.length)];
-  const repositoryResponse = await fetch(
-    `https://api.github.com/repos/${randomRepo.name}`,
-    {
-      referrerPolicy: "no-referrer",
-      headers: {
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        Authorization: `token ${process.env.GITHUB_TOKEN}`,
-      },
-    }
-  );
-  const repositoryJSON = await repositoryResponse.json();
-  const starCount = repositoryJSON.stargazers_count;
-  const flakCount = repositoryJSON.forks_count;
-  const avatarURL = repositoryJSON.owner?.avatar_url;
-  const defaultBranch: string = repositoryJSON.default_branch;
-  // 実際にgit の中身を取得する
-  const snipet: string[] = await getRandomSnipetsFromRepo(
-    randomRepo.name.split("/")[0],
-    randomRepo.name.split("/")[1],
-    defaultBranch,
-    randomRepo.lang
-  );
+  const randomRepo =
+    githubPopularRepos[Math.floor(Math.random() * githubPopularRepos.length)];
 
   const questionData: QuestionData = {
     repository: {
-      id: randomRepo.url,
-      org: randomRepo.name.split("/")[0],
-      avatarURL: avatarURL,
+      id: randomRepo.name,
+      org: randomRepo.org,
+      avatarURL: randomRepo.avatarURL,
       name: randomRepo.name,
       url: randomRepo.url,
       lang: randomRepo.lang,
-      star_num: starCount,
-      folk_num: flakCount,
+      star_num: randomRepo.star_num,
+      fork_num: randomRepo.fork_num,
+      snippets: randomRepo.snippets,
     },
-    codeSnippets: [
-      {
-        id: 1,
-        repository_id: randomRepo.url,
-        lang: randomRepo.lang,
-        code: snipet[0],
-      },
-    ],
+    candidates: githubPopularRepos.map((repo) => repo.name),
   };
 
   res.status(200).json(questionData);

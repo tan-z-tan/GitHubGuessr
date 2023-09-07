@@ -7,6 +7,8 @@ const Home: NextPage = () => {
   const [history, setHistory] = useState([]); // ゲームの履歴を保持
 
   function startGame() {
+    // ゲーム開始時にanswerLogをリセット
+    localStorage.removeItem("answerLog");
     window.location.href = "/game";
   }
 
