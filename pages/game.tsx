@@ -101,9 +101,9 @@ export default function Game() {
       </motion.div>
       <div className="relative w-5/6 md:max-w-xl">
         <motion.div
-          className="absolute w-8 h-8 text-white cursor-pointer text-4xl font-bold"
+          className="absolute w-8 h-8 text-indigo-400 cursor-pointer text-4xl font-bold"
           whileHover={{ scale: 1.2 }}
-          style={{ left: "12%", bottom: "36px" }}
+          style={{ left: "6%", bottom: "28px" }}
           onClick={nextSnippet(-1)}
         >
           {"←"}
@@ -112,9 +112,9 @@ export default function Game() {
       {/* 次のSnippetを表示するためのコンポーネント */}
       <div className="relative w-5/6 md:max-w-xl">
         <motion.div
-          className="absolute w-8 h-8 text-white cursor-pointer text-4xl font-bold"
+          className="absolute w-8 h-8 text-indigo-400 cursor-pointer text-4xl font-bold"
           whileHover={{ scale: 1.2 }}
-          style={{ right: "12%", bottom: "36px" }}
+          style={{ right: "6%", bottom: "28px" }}
           onClick={nextSnippet()}
         >
           {"→"}
