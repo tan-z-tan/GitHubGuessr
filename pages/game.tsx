@@ -190,8 +190,8 @@ export default function Game() {
             }
           >
             {currentQuestion?.repository.name == answer
-              ? "You win!🎉"
-              : "You lose😢"}
+              ? "Correct!🎉"
+              : "Oops!😢"}
           </p>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6 border-b-2 border-gray-200 pb-2">
             The repository is {" "}[
@@ -203,6 +203,11 @@ export default function Game() {
             {currentQuestion?.repository.name}]
             <p className="text-gray-300 font-normal text-sm max-w-md mx-auto my-2">
               {currentQuestion?.repository.desc}
+            </p>
+            <p className="text-gray-300 font-normal text-sm max-w-md mx-auto my-2">
+                <a href={currentQuestion?.repository.url} target="_blank">
+                    {currentQuestion?.repository.url}
+                </a>
             </p>
           </p>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
