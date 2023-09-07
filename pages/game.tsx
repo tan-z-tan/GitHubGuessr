@@ -169,9 +169,9 @@ export default function Game() {
               className="w-8 h-8"
               style={{ display: "inline-block" }}
             />
-            "{answer.correct_answer}"
+            [{answer.correct_answer}]
             <br />
-            Your answer is "{answer.user_answer}"
+            Your answer is [{answer.user_answer}]
           </div>
         ))}
       </div>
@@ -194,19 +194,19 @@ export default function Game() {
               : "You lose😢"}
           </p>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6 border-b-2 border-gray-200 pb-2">
-            The repository is {" "}
+            The repository is {" "}[
             <img
               src={currentQuestion?.repository.avatarURL}
               className="w-10 h-10"
               style={{ display: "inline-block" }}
             />
-            {currentQuestion?.repository.name}
+            {currentQuestion?.repository.name}]
             <p className="text-gray-300 font-normal text-sm max-w-md mx-auto my-2">
               {currentQuestion?.repository.desc}
             </p>
           </p>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
-            Your Answer is "{answer}"
+            Your Answer is [{answer}]
           </p>
           <motion.button
             whileHover={{ scale: 1.06 }}

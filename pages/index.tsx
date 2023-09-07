@@ -85,7 +85,7 @@ const Home: NextPage = () => {
                   className="w-6 h-6"
                   style={{ display: "inline-block" }}
                 />
-                "{answer.correct_answer}"
+                [{answer.correct_answer}]
                   </div>
             ))}
           </div>
