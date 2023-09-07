@@ -13,6 +13,7 @@ export default function Game() {
   const [snippetIndex, setSnippetIndex] = useState(0); // 現在のスニペットのインデックス
   const [showModal, setShowModal] = useState(false); // モーダルの表示フラグ
   const [answerable, setAnswerable] = useState(false); // 回答可能かどうか
+  const [secondsRemaining, setSecondsRemaining] = useState(60); // タイマーの残り時間
   const snipetControls = useAnimation();
   const snipetDragControls = useAnimation();
   const modalControls = useAnimation();
@@ -39,6 +40,24 @@ export default function Game() {
     setAnswerable(true);
   }
 
+  useEffect(() => {
+    if (currentQuestion) {
+      setSecondsRemaining(60);
+      const timerId = setInterval(() => {
+        setSecondsRemaining((prevSeconds) => {
+          if (prevSeconds <= 1) {
+            clearInterval(timerId);
+            checkAnswer();
+            return 60;
+          }
+          return prevSeconds - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timerId);
+    }
+  }, [currentQuestion]);
+
   function nextSnippet(dir: number = 1) {
     return () => {
       if (!currentQuestion) return;
@@ -57,7 +76,10 @@ export default function Game() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-700">
-      <h2 className="text-white text-2xl font-bold mb-4">
+      <div className={"text-lg mb-4 font-bold absolute top-0 right-0 mt-3 mr-4 " + (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")}>
+        {secondsRemaining}s
+      </div>
+      <h2 className="text-white text-2xl font-bold mb-4 mt-8">
         What is this repository? {questionIndex + 1}/{gameRound}
       </h2>
       <div className="text-white text-md mb-4">
@@ -73,7 +95,10 @@ export default function Game() {
       <motion.div
         animate={snipetControls}
         transition={{ ease: "easeInOut", delay: 0.3, duration: 0.5 }}
-        style={{ scale: 0.1, boxShadow: "0px 0px 20px 16px rgba(0, 0, 0, 0.4)" }}
+        style={{
+          scale: 0.1,
+          boxShadow: "0px 0px 20px 16px rgba(0, 0, 0, 0.4)",
+        }}
         className="w-5/6 md:max-w-xl bg-white rounded-full relative overflow-hidden aspect-square"
       >
         <div
@@ -194,7 +219,7 @@ export default function Game() {
               : "Oops!😢"}
           </p>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6 border-b-2 border-gray-200 pb-2">
-            The repository is {" "}[
+            The repository is [
             <img
               src={currentQuestion?.repository.avatarURL}
               className="w-10 h-10"
@@ -205,9 +230,9 @@ export default function Game() {
               {currentQuestion?.repository.desc}
             </p>
             <p className="text-gray-300 font-normal text-sm max-w-md mx-auto my-2">
-                <a href={currentQuestion?.repository.url} target="_blank">
-                    {currentQuestion?.repository.url}
-                </a>
+              <a href={currentQuestion?.repository.url} target="_blank">
+                {currentQuestion?.repository.url}
+              </a>
             </p>
           </p>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
@@ -227,7 +252,7 @@ export default function Game() {
   );
 
   function checkAnswer() {
-    if (!answer) return; // もし文字がなければ何もしない
+    // if (!answer) return; // もし文字がなければ何もしない
 
     setAnswerable(false);
     const isCorrect = answer === currentQuestion?.repository.name;
