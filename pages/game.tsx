@@ -76,7 +76,12 @@ export default function Game() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-700">
-      <div className={"text-lg w-full md:max-w-lg text-right font-bold mr-4 " + (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")}>
+      <div
+        className={
+          "text-lg w-full md:max-w-lg text-right font-bold mr-4 " +
+          (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")
+        }
+      >
         {secondsRemaining}s
       </div>
       <h2 className="text-white text-2xl font-bold mb-4">

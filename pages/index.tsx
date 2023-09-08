@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Answer } from "../types";
+import Layout from "../components/Layout";
 
 const Home: NextPage = () => {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
@@ -21,34 +22,8 @@ const Home: NextPage = () => {
   }
 
   return (
-    <motion.div
-      className="flex flex-col items-center justify-center min-h-screen py-2"
-      initial="initial"
-      animate="in"
-      variants={{
-        initial: {
-          opacity: 0,
-        },
-        in: {
-          opacity: 1,
-        },
-      }}
-      transition={{
-        type: "tween",
-        duration: 0.8,
-      }}
-    >
-      <Head>
-        <title>GitHub-Guessr</title>
-        <meta name="description" content="Guess GitHub repositories by codes" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main
-        className={
-          "flex flex-col items-center justify-center w-full flex-1 px-10 text-center"
-        }
-      >
+    <Layout>
+      <main className={"flex flex-col items-center justify-center flex-1"}>
         <h1
           className={
             "text-4xl font-extrabold leading-none tracking-tight text-gray-600 mb-4"
@@ -91,7 +66,7 @@ const Home: NextPage = () => {
           </div>
         )}
       </main>
-    </motion.div>
+    </Layout>
   );
 };
 
