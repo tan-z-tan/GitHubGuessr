@@ -12,6 +12,7 @@ const EXT_BY_LANG: { [key: string]: string } = {
   Python: ".py",
   Go: ".go",
   C: ".c",
+  D: ".d",
   "C++": ".cpp",
   Java: ".java",
   Ruby: ".rb",
@@ -42,20 +43,24 @@ const EXT_BY_LANG: { [key: string]: string } = {
 };
 const GITHUB_API_URL = "https://api.github.com";
 const SNIPPETS = 10;
-const MAX_LINE = 64;
+const MAX_LINE = 32;
 
 async function selectRandomSnippet(repoName: string, files: any[]) {
   // 基準を満たすファイルが見つからない場合は10回までリトライ
-  for (let retry = 0; retry < 10; retry++) {
+  for (let retry = 0; retry < SNIPPETS; retry++) {
     const randomIndex = Math.floor(Math.random() * files.length);
     const f = files[randomIndex];
 
     if (!f) {
       continue;
     }
+    // timeout 10s
     const response = await axios.get(
       `${GITHUB_API_URL}/repos/${repoName}/contents/${f.path}`,
-      { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } }
+      {
+        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
+        timeout: 10000,
+      }
     );
     // Base64デコードして内容を取得
     const content = Buffer.from(response.data.content, "base64").toString(
@@ -90,7 +95,12 @@ async function getRandomSnippetsFromRepo(
   const response = await axios.get(
     `${GITHUB_API_URL}/repos/${repoName}/git/trees/${defaultBranch}?recursive=1`,
     // githun access token
-    { headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` } }
+    {
+      headers: {
+        Authorization: `token ${process.env.GITHUB_TOKEN}`,
+        timeout: 10000,
+      },
+    }
   );
   const tree = response.data.tree;
   const fileExts = langs.map((lang) => EXT_BY_LANG[lang]).filter((ext) => ext);
@@ -115,6 +125,7 @@ async function fetchSnippetsForRepos() {
 
   for (const repo of githubPopularRepos) {
     // fetch repo information
+    console.log(`fetching ${repo.name}`);
     const repositoryResponse = await fetch(
       `https://api.github.com/repos/${repo.name}`,
       {

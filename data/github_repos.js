@@ -281,4 +281,109 @@ export const githubPopularRepos = [
     lang: "C",
     desc: "Redis is an in-memory database that persists on disk. It also provides Lua scripting, replication, and more.",
   },
+  {
+    name: "microsoft/terminal",
+    lang: "C++",
+    desc: "The new Windows Terminal and the original Windows console host, all in the same place!",
+  },
+  {
+    name: "fastai/fastai",
+    lang: "Python",
+    desc: "The fastai deep learning library, plus lessons and tutorials.",
+  },
+  {
+    name: "getsentry/sentry",
+    lang: "Python",
+    desc: "Application monitoring platform, helps developers see performance issues, fix errors, and optimize their code.",
+  },
+  {
+    name: "prettier/prettier",
+    lang: "JavaScript",
+    desc: "Prettier is an opinionated code formatter.",
+  },
+  {
+    name: "pytorch/pytorch",
+    lang: "C++, Python",
+    desc: "Tensors and Dynamic neural networks in Python with strong GPU acceleration.",
+  },
+  {
+    name: "SeleniumHQ/selenium",
+    lang: "Java",
+    desc: "A browser automation framework and ecosystem.",
+  },
+  {
+    name: "kennethreitz/requests",
+    lang: "Python",
+    desc: "Python HTTP Requests for Humans.",
+  },
+  {
+    name: "cockroachdb/cockroach",
+    lang: "Go",
+    desc: "CockroachDB - the open source, cloud-native distributed SQL database.",
+  },
+  {
+    name: "apollographql/apollo-client",
+    lang: "TypeScript",
+    desc: "A fully-featured, production ready caching GraphQL client for every UI framework and GraphQL server.",
+  },
+  {
+    name: "huggingface/transformers",
+    lang: "Python",
+    desc: "Transformers: State-of-the-art Natural Language Processing for TensorFlow 2.0 and PyTorch.",
+  },
+  {
+    name: "google-research/bert",
+    lang: "Python",
+    desc: "TensorFlow code and pre-trained models for BERT.",
+  },
+  {
+    name: "openai/gpt-2",
+    lang: "Python",
+    desc: "Code for the paper \"Language Models are Unsupervised Multitask Learners\".",
+  },
+  {
+    name: "llvm/llvm-project",
+    lang: "C++",
+    desc: "The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.",
+  },
+  {
+    name: "dlang/dmd",
+    lang: "D",
+    desc: "The D Programming Language Compiler.",
+  },
+  {
+    name: "crystal-lang/crystal",
+    lang: "Crystal",
+    desc: "The Crystal Programming Language.",
+  },
+  {
+    name: "scikit-learn/scikit-learn",
+    lang: "Python",
+    desc: "Scikit-learn: Machine Learning in Python.",
+  },
+  {
+    name: "python/cpython",
+    lang: "Python",
+    desc: "The Python programming language.",
+  },
+  {
+    name: "numpy/numpy",
+    lang: "Python",
+    desc: "The fundamental package for scientific computing with Python.",
+  },
+  {
+    name: "openjdk/jdk",
+    lang: "Java",
+    desc: "The Java Development Kit.",
+  },
+  {
+    name: "tokio-rs/tokio",
+    lang: "Rust",
+    desc: "A runtime for writing reliable asynchronous applications with Rust. Provides I/O, networking, scheduling, timers, ...",
+  },
+  {
+    name: "jquery/jquery",
+    lang: "JavaScript",
+    desc: "jQuery JavaScript Library.",
+  }
 ];
