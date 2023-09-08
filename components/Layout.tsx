@@ -52,12 +52,20 @@ export default function Layout({
         <meta httpEquiv="content-language" content={"en"} />
       </Head>
       {children}
-      <footer className="flex items-center justify-center w-full h-12 border-t text-gray-500 mt-6">
-        <a className="flex items-center justify-center font-extrabold" href="/">
-          <span className="text-xl tracking-tight">GitHub-Guessr</span>
-        </a>
-        <a className="flex items-center justify-center">
-          <span className="text-xl tracking-tight">@tan-z-tan</span>
+      <footer className="flex items-center justify-center w-full h-12 border-t text-gray-500 text-xl mt-6">
+        GitHub-Guessr
+        <a
+          className="ml-2"
+          href="https://github.com/tan-z-tan/GitHubGuessr"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="/github-mark.png"
+            className="w-5 h-5 inline-block"
+            style={{ marginTop: "-4px" }}
+          />
+          Code
         </a>
       </footer>
     </motion.div>
