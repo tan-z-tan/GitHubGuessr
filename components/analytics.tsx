@@ -7,7 +7,6 @@ export const Analytics: FC = () => {
   if (process.env.NODE_ENV !== "production") {
     return <></>;
   }
-  console.log("NEXT_PUBLIC_ANALYTICS_ID", ANALYTICS_ID);
   if (!ANALYTICS_ID) {
     return <></>;
   }

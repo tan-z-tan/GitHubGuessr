@@ -249,7 +249,7 @@ export default function Game() {
             className="bg-indigo-400 hover:bg-indigo-500 text-white font-bold mt-6 py-2 px-4 rounded-full"
             onClick={goToNextQuestion}
           >
-            {questionIndex >= gameRound - 1 ? "Show Result" : "Next Quize"}
+            {questionIndex >= gameRound - 1 ? "Show Result" : "Next Round"}
           </motion.button>
         </motion.div>
       )}
