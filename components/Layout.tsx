@@ -53,16 +53,16 @@ export default function Layout({
       </Head>
       {children}
       <footer className="flex items-center justify-center w-full h-12 border-t text-gray-500 text-xl mt-6">
-        GitHub-Guessr
+        <span className="font-extrabold">GitHub-Guessr</span>
         <a
-          className="ml-2"
+          className="ml-3 text-gray-600 hover:text-gray-500"
           href="https://github.com/tan-z-tan/GitHubGuessr"
           target="_blank"
           rel="noopener noreferrer"
         >
           <img
             src="/github-mark.png"
-            className="w-5 h-5 inline-block"
+            className="w-5 h-5 inline-block mr-0.5"
             style={{ marginTop: "-4px" }}
           />
           Code
