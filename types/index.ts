@@ -30,6 +30,7 @@ export type QuestionData = {
 export type Answer = {
   user_id: string;
   user_answer: string;
+  time_remaining: number;
   correct_answer: string;
   repo_image_url: string;
   repo_url: string;

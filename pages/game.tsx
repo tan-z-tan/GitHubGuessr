@@ -271,6 +271,7 @@ export default function Game() {
       repo_image_url: currentQuestion?.repository.avatarURL || "",
       repo_url: currentQuestion?.repository.url || "",
       user_answer: answer,
+      time_remaining: secondsRemaining,
       correct_answer: currentQuestion?.repository.name || "",
       is_correct: isCorrect,
     };

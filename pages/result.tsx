@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { Answer } from "../types";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { start } from "repl";
 import Layout from "../components/Layout";
 
 export default function Result() {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
   const hitNum = answerLog.filter((answer) => answer.is_correct).length;
-  const score = Math.round((100 * hitNum) / answerLog.length);
+  const score = answerLog.reduce((sum, answer) => sum + (answer.is_correct ? 100 + (answer.time_remaining || 0) : 0), 0);
 
   useEffect(() => {
     // LocalStorageからスコアと回答履歴を取得
@@ -50,12 +48,12 @@ export default function Result() {
           <span className="text-indigo-500 text-2xl">
             Your GitHub-Guessr score is{" "}
             <span className="font-extrabold text-4xl">
-              {" " + score}%
-              {score === 100 ? (
+              {" " + score}
+              {score > 1000 ? (
                 "🎉🎉🎉"
-              ) : score >= 70 ? (
+              ) : score >= 700 ? (
                 "🎉"
-              ) : score >= 50 ? (
+              ) : score >= 400 ? (
                 "🙂"
               ) : (
                 "😢"
