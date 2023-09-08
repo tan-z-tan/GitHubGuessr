@@ -87,7 +87,7 @@ export default function Game() {
       <h2 className="text-white text-2xl font-bold mb-4">
         What is this repository? {questionIndex + 1}/{gameRound}
       </h2>
-      <div className="text-white text-md mb-4">
+      <div className="text-white text-md mb-2">
         <span className="font-bold">
           {currentQuestion?.repository.star_num}
         </span>
@@ -96,6 +96,22 @@ export default function Game() {
           {currentQuestion?.repository.fork_num}
         </span>
         {" forks"}
+      </div>
+      <div className="text-white text-md mb-4 text-left text-center">
+        {secondsRemaining < 30 && (
+          <p className="text-white ml-2">
+            Hint: {currentQuestion?.repository.lang}
+          </p>
+        )}
+        {secondsRemaining < 15 && (
+          <p className="text-white ml-2">
+            Hint: {" "}
+            <img
+              src={currentQuestion?.repository.avatarURL}
+              className="w-7 h-7 inline-block"
+            />
+          </p>
+        )}
       </div>
       <motion.div
         animate={snipetControls}
