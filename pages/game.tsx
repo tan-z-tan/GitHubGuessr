@@ -99,13 +99,16 @@ export default function Game() {
       </div>
       <div className="text-white text-md mb-4 text-left text-center">
         {secondsRemaining < 30 && (
-          <p className="text-white ml-2">
-            Hint: {currentQuestion?.repository.lang}
+          <p className="text-green-500 ml-2">
+            Hint:{" "}
+            <span className="font-bold">
+              {currentQuestion?.repository.lang}
+            </span>
           </p>
         )}
         {secondsRemaining < 15 && (
-          <p className="text-white ml-2">
-            Hint: {" "}
+          <p className="text-green-500 ml-2">
+            Hint:{" "}
             <img
               src={currentQuestion?.repository.avatarURL}
               className="w-7 h-7 inline-block"
