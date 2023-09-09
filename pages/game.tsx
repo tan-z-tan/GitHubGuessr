@@ -177,6 +177,7 @@ export default function Game() {
       <div className="mt-1 flex flex-wrap justify-center md:max-w-xl">
         {currentQuestion?.candidates.map((candidate) => (
           <button
+            key={candidate}
             className={
               "py-1.5 px-2 rounded-full m-1.5 " +
               (answer == candidate
