@@ -197,32 +197,6 @@ export default function Game() {
       >
         Guess!!
       </button>
-      {/* <Autocomplete
-        className="w-80 rounded-full bg-gray-200 px-4 py-0 mt-2 mb-4"
-        styles={{
-          control: (baseStyles, state) => ({
-            ...baseStyles,
-            borderColor: "None",
-            backgroundColor: "transparent",
-            "&:hover": {
-              borderColor: "None",
-            },
-            "&:focus": {
-              borderColor: "None",
-            },
-            "&:active": {
-              borderColor: "None",
-            },
-          }),
-        }}
-        defaultValue={null}
-        onChange={(selected) => {
-          if (selected) setAnswer(selected.value);
-        }}
-        options={currentQuestion?.candidates.map((candidate) => {
-          return { value: candidate, label: candidate };
-        })}
-      /> */}
       <div className="text-white text-lg mt-4 mx-3">
         {answerLog.map((answer, index) => (
           <div key={index} className="mb-2">
