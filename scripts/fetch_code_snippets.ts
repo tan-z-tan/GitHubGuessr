@@ -66,8 +66,8 @@ async function selectRandomSnippet(repoName: string, files: any[]) {
     const content = Buffer.from(response.data.content, "base64").toString(
       "utf-8"
     );
-    // if there is no ascii character, retry
-    if (!/^[\x20-\x7e]*$/.test(content)) {
+    // if there is a to z character, retry
+    if (content.match(/[a-z]/)) {
       continue;
     }
     const lines = content.split("\n");
