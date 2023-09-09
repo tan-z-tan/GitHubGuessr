@@ -66,6 +66,10 @@ async function selectRandomSnippet(repoName: string, files: any[]) {
     const content = Buffer.from(response.data.content, "base64").toString(
       "utf-8"
     );
+    // if there is no ascii character, retry
+    if (!/^[\x20-\x7e]*$/.test(content)) {
+      continue;
+    }
     const lines = content.split("\n");
     // line が10行未満の場合はリトライ
     if (lines.length < 10) {
