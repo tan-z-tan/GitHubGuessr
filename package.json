@@ -14,6 +14,7 @@
     "dotenv": "^16.3.1",
     "firebase-admin": "^11.10.1",
     "framer-motion": "^10.16.4",
+    "lodash": "^4.17.21",
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -21,6 +22,7 @@
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.198",
     "@types/node": "20.5.9",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
