@@ -76,14 +76,6 @@ export default function Game() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-700">
-      <div
-        className={
-          "text-lg w-full md:max-w-lg text-right font-bold mr-4 " +
-          (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")
-        }
-      >
-        {secondsRemaining}s
-      </div>
       <h2 className="text-white text-2xl font-bold mb-4">
         What is this repository? {questionIndex + 1}/{gameRound}
       </h2>
@@ -97,7 +89,7 @@ export default function Game() {
         </span>
         {" forks"}
       </div>
-      <div className="text-white text-md mb-4 text-left text-center">
+      <div className="text-white text-md mb-2 text-left text-center">
         {secondsRemaining < 30 && (
           <p className="text-green-500 ml-2">
             Hint:{" "}
@@ -116,38 +108,49 @@ export default function Game() {
           </p>
         )}
       </div>
-      <motion.div
-        animate={snipetControls}
-        transition={{ ease: "easeInOut", delay: 0.3, duration: 0.5 }}
-        style={{
-          scale: 0.1,
-          boxShadow: "0px 0px 20px 16px rgba(0, 0, 0, 0.4)",
-        }}
-        className="w-11/12 md:max-w-xl bg-white rounded-full relative overflow-hidden aspect-square"
-      >
-        <div
-          className="relative flex justify-center items-center"
-          ref={dragParentRef}
+      <div className="relative w-full">
+        <motion.div
+          animate={snipetControls}
+          transition={{ ease: "easeInOut", delay: 0.3, duration: 0.5 }}
           style={{
-            background: "white",
-            aspectRatio: 1,
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            scale: 0.1,
+            boxShadow: "0px 0px 20px 16px rgba(0, 0, 0, 0.4)",
           }}
+          className="w-5/6 mx-auto md:max-w-xl bg-white rounded-full relative overflow-hidden aspect-square"
         >
-          <motion.pre
-            drag
-            dragConstraints={dragParentRef}
-            animate={snipetDragControls}
-            ref={dragAreaRef}
-            className="font-mono text-sm"
+          <div
+            className="relative flex justify-center items-center"
+            ref={dragParentRef}
+            style={{
+              background: "white",
+              aspectRatio: 1,
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            {currentQuestion?.repository.snippets[snippetIndex]}
-          </motion.pre>
+            <motion.pre
+              drag
+              dragConstraints={dragParentRef}
+              animate={snipetDragControls}
+              ref={dragAreaRef}
+              className="font-mono text-sm"
+            >
+              {currentQuestion?.repository.snippets[snippetIndex]}
+            </motion.pre>
+          </div>
+        </motion.div>
+        <div
+          className={
+            "absolute text-lg md:max-w-lg text-right font-bold mr-4 " +
+            (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")
+          }
+          style={{ top: "4%", right: "4%" }}
+        >
+          {secondsRemaining}s
         </div>
-      </motion.div>
+      </div>
       <div className="relative w-5/6 md:max-w-xl">
         <motion.div
           className="absolute w-8 h-8 text-indigo-400 cursor-pointer text-4xl font-bold"
@@ -169,7 +172,31 @@ export default function Game() {
           {"→"}
         </motion.div>
       </div>
-      <Autocomplete
+      {/* 横並びに選択肢を表示する */}
+      <h3 className="text-white text-lg mt-4 mx-3">Choose the repository you guess</h3>
+      <div className="mt-1 flex flex-wrap justify-center md:max-w-xl">
+        {currentQuestion?.candidates.map((candidate) => (
+          <button
+            className={
+              "py-1.5 px-2 rounded-full m-1.5 " +
+              (answer == candidate
+                ? "bg-indigo-500 hover:bg-indigo-600 text-gray-100"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-700")
+            }
+            onClick={() => setAnswer(candidate)}
+          >
+            {candidate}
+          </button>
+        ))}
+      </div>
+      <button
+        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 ml-2 mt-4 rounded-full"
+        onClick={() => checkAnswer()}
+        disabled={!answerable}
+      >
+        Guess!!
+      </button>
+      {/* <Autocomplete
         className="w-80 rounded-full bg-gray-200 px-4 py-0 mt-2 mb-4"
         styles={{
           control: (baseStyles, state) => ({
@@ -194,14 +221,7 @@ export default function Game() {
         options={currentQuestion?.candidates.map((candidate) => {
           return { value: candidate, label: candidate };
         })}
-      />
-      <button
-        className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full"
-        onClick={() => checkAnswer()}
-        disabled={!answerable}
-      >
-        Guess
-      </button>
+      /> */}
       <div className="text-white text-lg mt-4 mx-3">
         {answerLog.map((answer, index) => (
           <div key={index} className="mb-2">
