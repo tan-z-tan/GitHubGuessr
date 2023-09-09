@@ -3,8 +3,23 @@ import axios from "axios";
 import { Repository } from "../types";
 import { githubPopularRepos } from "../data/github_repos";
 import dotenv from "dotenv";
+import * as admin from "firebase-admin";
 
 dotenv.config(); // .envの内容をprocess.envに反映
+
+// Initialize Firebase Admin
+if (!admin.apps.length) {
+  const serviceAccount = {
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    projectId: process.env.FIREBASE_PROJECT_ID
+  };
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+const firestore = admin.firestore();
 
 const EXT_BY_LANG: { [key: string]: string } = {
   TypeScript: ".ts",
@@ -46,43 +61,53 @@ const SNIPPETS = 10;
 const MAX_LINE = 32;
 
 async function selectRandomSnippet(repoName: string, files: any[]) {
-  // 基準を満たすファイルが見つからない場合は10回までリトライ
-  for (let retry = 0; retry < SNIPPETS; retry++) {
-    const randomIndex = Math.floor(Math.random() * files.length);
-    const f = files[randomIndex];
+  for (let i = 0; i < SNIPPETS; i++) {
+    // retry 5 times
+    for (let retry = 0; retry < 5; retry++) {
+      const randomIndex = Math.floor(Math.random() * files.length);
+      const f = files[randomIndex];
 
-    if (!f) {
-      continue;
-    }
-    // timeout 10s
-    const response = await axios.get(
-      `${GITHUB_API_URL}/repos/${repoName}/contents/${f.path}`,
-      {
-        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
-        timeout: 10000,
+      if (!f) {
+        continue;
       }
-    );
-    // Base64デコードして内容を取得
-    const content = Buffer.from(response.data.content, "base64").toString(
-      "utf-8"
-    );
-    // if there is a to z character, retry
-    if (content.match(/[a-z]/)) {
-      continue;
-    }
-    const lines = content.split("\n");
-    // line が10行未満の場合はリトライ
-    if (lines.length < 10) {
-      continue;
-    }
+      // timeout 10s
+      const response = await axios.get(
+        `${GITHUB_API_URL}/repos/${repoName}/contents/${f.path}`,
+        {
+          headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
+          timeout: 10000,
+        }
+      );
+      // Base64デコードして内容を取得
+      const content = Buffer.from(response.data.content, "base64").toString(
+        "utf-8"
+      );
+      // if there is no alphabet character, retry
+      if (!content.match(/[a-z]/)) {
+        console.log("a to z character found");
+        continue;
+      }
 
-    // ファイルのランダムな部分を取得
-    const randomStart = Math.floor(Math.random() * (lines.length - MAX_LINE));
-    const snippet = content
-      .split("\n")
-      .slice(randomStart, randomStart + MAX_LINE)
-      .join("\n");
-    return snippet;
+      // if snippet contains repository name, retry
+      if (content.includes(repoName)) {
+        console.log("repository name found");
+        continue;
+      }
+
+      const lines = content.split("\n");
+      // line が10行未満の場合はリトライ
+      if (lines.length < 10) {
+        continue;
+      }
+
+      // ファイルのランダムな部分を取得
+      const randomStart = Math.floor(Math.random() * (lines.length - MAX_LINE));
+      const snippet = content
+        .split("\n")
+        .slice(randomStart, randomStart + MAX_LINE)
+        .join("\n");
+      return snippet;
+    }
   }
   return undefined;
 }
@@ -124,14 +149,56 @@ async function getRandomSnippetsFromRepo(
   return randomSnippets;
 }
 
+async function upsertRepository(repository: Repository) {
+  const repoId = repository.name.replace("/", "-");
+  const docRef = firestore.collection("repositories").doc(repoId);
+  const doc = await docRef.get();
+  if (doc.exists) {
+    await docRef.update(repository);
+  } else {
+    await docRef.set(repository);
+  }
+}
+
+async function fetchRepository(
+  repoName: string
+): Promise<Repository | undefined> {
+  const repoId = repoName.replace("/", "-");
+  const docRef = firestore.collection("repositories").doc(repoId);
+  const doc = await docRef.get();
+  if (doc.exists) {
+    const data = doc.data();
+    if (!data) {
+      return undefined;
+    }
+    const updatedAt = data.updatedAt.toDate();
+    return {
+      ...data,
+      updatedAt: updatedAt,
+    } as Repository;
+  } else {
+    return undefined;
+  }
+}
+
 async function fetchSnippetsForRepos() {
   const output: Repository[] = [];
 
-  for (const repo of githubPopularRepos) {
+  for (const repoMeta of githubPopularRepos) {
     // fetch repo information
-    console.log(`fetching ${repo.name}`);
+    console.log(`fetching ${repoMeta.name}`);
+    const repoDoc = await fetchRepository(repoMeta.name);
+    if (
+      repoDoc &&
+      repoDoc.updatedAt.getTime() > new Date().getTime() - 1000 * 60 * 60 * 12
+    ) {
+      console.log("skip");
+      output.push(repoDoc);
+      continue;
+    }
+
     const repositoryResponse = await fetch(
-      `https://api.github.com/repos/${repo.name}`,
+      `https://api.github.com/repos/${repoMeta.name}`,
       {
         referrerPolicy: "no-referrer",
         headers: {
@@ -147,32 +214,33 @@ async function fetchSnippetsForRepos() {
     const avatarURL = repositoryJSON.owner?.avatar_url;
     const githubURL = repositoryJSON.html_url;
     const defaultBranch: string = repositoryJSON.default_branch;
-    const lang = repo.lang;
+    const lang = repoMeta.lang;
     const snippets = await getRandomSnippetsFromRepo(
-      repo.name,
+      repoMeta.name,
       defaultBranch,
       lang.split(",").map((l) => l.trim())
     );
-    output.push({
-      id: repo.name,
-      org: repo.name.split("/")[0],
+    const repo: Repository = {
+      org: repoMeta.name.split("/")[0],
+      updatedAt: new Date(),
       avatarURL: avatarURL,
-      name: repo.name,
+      name: repoMeta.name,
       url: githubURL,
-      lang: repo.lang,
-      desc: repo.desc,
+      lang: lang,
+      desc: repoMeta.desc,
       star_num: starCount,
       fork_num: flakCount,
       snippets: snippets,
-    });
+    };
+    output.push(repo);
+    await upsertRepository(repo);
   }
 
-  // Typescript形式で保存。このデータを pages/api/question.tsで利用する。
+  // write to file
   fs.writeFileSync(
     "./data/repo_with_snippets.ts",
-    "export const githubPopularRepos = " + JSON.stringify(output, null, 2) + ";"
+    `export const githubPopularRepos = ${JSON.stringify(output, null, 2)}`
   );
-  console.log(JSON.stringify(output, null, 2));
 }
 
 // 関数を呼び出して結果を出力

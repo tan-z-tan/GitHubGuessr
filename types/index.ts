@@ -1,5 +1,5 @@
 export type Repository = {
-  id: string; // URL を ID として使うことが一般的なので、string 型としています
+  updatedAt: Date;
   org: string;
   avatarURL: string;
   name: string;

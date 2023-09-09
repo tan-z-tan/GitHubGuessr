@@ -14,8 +14,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const questionData: QuestionData = {
     repository: {
-      id: randomRepo.name,
-      org: randomRepo.org,
+      org: randomRepo.org,      
+      updatedAt: new Date(),  // we don't use updatedAt for now
       avatarURL: randomRepo.avatarURL,
       name: randomRepo.name,
       url: randomRepo.url,
