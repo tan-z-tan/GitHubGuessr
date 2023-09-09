@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Answer } from "../types";
 import Layout from "../components/Layout";
+import { v4 as uuidv4 } from "uuid";
 
 const Home: NextPage = () => {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
@@ -18,6 +19,8 @@ const Home: NextPage = () => {
   function startGame() {
     // ゲーム開始時にanswerLogをリセット
     localStorage.removeItem("answerLog");
+    const randomId = uuidv4();
+    localStorage.setItem("game_id", randomId);
     window.location.href = "/game";
   }
 

@@ -737,6 +737,11 @@
     "@types/mime" "*"
     "@types/node" "*"
 
+"@types/uuid@^9.0.3":
+  "integrity" "sha512-taHQQH/3ZyI3zP8M/puluDEIEvtQHVYcC6y3N8ijFtAd28+Ey/G4sg1u2gB01S8MwybLOKAp9/yCMu/uR5l3Ug=="
+  "resolved" "https://registry.npmjs.org/@types/uuid/-/uuid-9.0.3.tgz"
+  "version" "9.0.3"
+
 "@typescript-eslint/parser@^5.4.2 || ^6.0.0":
   "integrity" "sha512-setq5aJgUwtzGrhW177/i+DMLqBaJbdwGj2CPIVFFLE0NCliy5ujIdLHd2D1ysmlmsjdL2GWW+hR85neEfc12w=="
   "resolved" "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-6.6.0.tgz"

@@ -4,22 +4,9 @@ import { Repository } from "../types";
 import { githubPopularRepos } from "../data/github_repos";
 import dotenv from "dotenv";
 import * as admin from "firebase-admin";
+import firestore from "../utils/firebaseAdmin";
 
 dotenv.config(); // .envの内容をprocess.envに反映
-
-// Initialize Firebase Admin
-if (!admin.apps.length) {
-  const serviceAccount = {
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    projectId: process.env.FIREBASE_PROJECT_ID
-  };
-
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
-const firestore = admin.firestore();
 
 const EXT_BY_LANG: { [key: string]: string } = {
   TypeScript: ".ts",

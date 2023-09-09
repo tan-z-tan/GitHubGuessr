@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Answer } from "../types";
 import { motion } from "framer-motion";
 import Layout from "../components/Layout";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Result() {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
@@ -19,6 +20,8 @@ export default function Result() {
   function startGame() {
     // ゲーム開始時にanswerLogをリセット
     localStorage.removeItem("answerLog");
+    const randomId = uuidv4();
+    localStorage.setItem("game_id", randomId);
     window.location.href = "/game";
   }
 

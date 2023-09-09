@@ -1,7 +1,7 @@
 import { useState, useEffect, use, useRef } from "react";
 import { Answer, QuestionData } from "../types";
 import { motion, useAnimation } from "framer-motion";
-import Autocomplete from "react-select";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Game() {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(
@@ -9,6 +9,8 @@ export default function Game() {
   );
   const [answer, setAnswer] = useState("");
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
+  const [userId, setUserId] = useState("");
+  const [gameId, setGameId] = useState("");
   const [questionIndex, setQuestionIndex] = useState(0); // 現在の質問のインデックス
   const [snippetIndex, setSnippetIndex] = useState(0); // 現在のスニペットのインデックス
   const [showModal, setShowModal] = useState(false); // モーダルの表示フラグ
@@ -20,6 +22,27 @@ export default function Game() {
   const gameRound = 10; // ゲームのラウンド数
   const dragParentRef = useRef<HTMLDivElement>(null);
   const dragAreaRef = useRef<HTMLPreElement>(null);
+
+  useEffect(() => {
+    // Generate random user id by uuid v4
+    const existUserId = localStorage.getItem("user_id");
+    if (existUserId) {
+      setUserId(existUserId);
+    } else {
+      const randomId = uuidv4();
+      setUserId(randomId);
+      localStorage.setItem("user_id", randomId);
+    }
+    // Generate random game id by uuid v4
+    const existGameId = localStorage.getItem("game_id");
+    if (existGameId) {
+      setGameId(existGameId);
+    } else {
+      const randomId = uuidv4();
+      setGameId(randomId);
+      localStorage.setItem("game_id", randomId);
+    }
+  }, []);
 
   useEffect(() => {
     const answerLog = JSON.parse(localStorage.getItem("answerLog") || "[]");
@@ -192,7 +215,7 @@ export default function Game() {
       </div>
       <button
         className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 ml-2 mt-4 rounded-full"
-        onClick={() => checkAnswer()}
+        onClick={checkAnswer}
         disabled={!answerable}
       >
         Guess!!
@@ -237,7 +260,7 @@ export default function Game() {
               ? "Correct!🎉"
               : "Oops!😢"}
           </p>
-          <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6 border-b-2 border-gray-200 pb-2">
+          <div className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6 border-b-2 border-gray-200 pb-2">
             The repository is [
             <img
               src={currentQuestion?.repository.avatarURL}
@@ -253,7 +276,7 @@ export default function Game() {
                 {currentQuestion?.repository.url}
               </a>
             </p>
-          </p>
+          </div>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
             Your Answer is [{answer}]
           </p>
@@ -270,18 +293,29 @@ export default function Game() {
     </div>
   );
 
-  function checkAnswer() {
-    // if (!answer) return; // もし文字がなければ何もしない
-
+  async function checkAnswer() {
     setAnswerable(false);
-    const isCorrect = answer === currentQuestion?.repository.name;
-    // setCorrectAnswer(isCorrect);
+    const isCorrect = answer == currentQuestion?.repository.name;
+    fetch("/api/send_answer", {
+      method: "POST",
+      body: JSON.stringify({
+        user_id: userId,
+        game_id: gameId,
+        user_answer: answer,
+        round: questionIndex,
+        correct_answer: currentQuestion?.repository.name || "",
+        time_remaining: secondsRemaining,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
     modalControls.start({ opacity: [0, 1] });
     setShowModal(true);
 
     // LocalStorageに回答履歴を保存
     const currentLog: Answer = {
-      user_id: "dummyUser", // 今回はダミーのユーザーIDを使用
+      user_id: userId,
       repo_image_url: currentQuestion?.repository.avatarURL || "",
       repo_url: currentQuestion?.repository.url || "",
       user_answer: answer,
