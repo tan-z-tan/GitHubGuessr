@@ -312,7 +312,7 @@ export const githubPopularRepos = [
     desc: "A browser automation framework and ecosystem.",
   },
   {
-    name: "kennethreitz/requests",
+    name: "psf/requests",
     lang: "Python",
     desc: "Python HTTP Requests for Humans.",
   },
