@@ -32,8 +32,26 @@ export default function Result() {
     window.location.href = "/game";
   }
 
-  const scoreBin = Math.ceil(score / 100) / 10;
-  console.log(scoreBin);
+  if (answerLog.length === 0) {
+    return (
+      <Layout>
+        <h1 className="text-3xl font-bold mb-4">No result found 🧐</h1>
+        <h2 className="text-4xl font-extrabold leading-none tracking-tight text-gray-600 mt-6 mb-4">
+          GitHub-Guessr
+        </h2>
+        <motion.button
+          className="bg-white border border-indigo-500
+        hover:text-indigo-400 text-indigo-500 font-bold py-2 px-4 rounded-full mt-4"
+          whileHover={{ scale: 1.06 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          onClick={() => (window.location.href = "/")}
+        >
+          Go to Top
+        </motion.button>
+      </Layout>
+    );
+  }
+  const scoreBin = Math.ceil((hitNum / answerLog.length) * 10) / 10;
   const data = [
     {
       name: "0",
@@ -92,25 +110,6 @@ export default function Result() {
     },
   ];
 
-  if (answerLog.length === 0) {
-    return (
-      <Layout>
-        <h1 className="text-3xl font-bold mb-4">No result found 🧐</h1>
-        <h2 className="text-4xl font-extrabold leading-none tracking-tight text-gray-600 mt-6 mb-4">
-          GitHub-Guessr
-        </h2>
-        <motion.button
-          className="bg-white border border-indigo-500
-        hover:text-indigo-400 text-indigo-500 font-bold py-2 px-4 rounded-full mt-4"
-          whileHover={{ scale: 1.06 }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-          onClick={() => (window.location.href = "/")}
-        >
-          Go to Top
-        </motion.button>
-      </Layout>
-    );
-  }
   return (
     <Layout>
       <main className={"flex flex-col items-center justify-center flex-1 px-2"}>
@@ -137,7 +136,7 @@ export default function Result() {
                   <Cell
                     key={`cell-${index}`}
                     fill={
-                      parseFloat(entry.name) <= scoreBin ? "#8884d8" : "gray"
+                      parseFloat(entry.name) <= scoreBin ? "#8884d8" : "#bbb"
                     }
                   />
                 ))}
