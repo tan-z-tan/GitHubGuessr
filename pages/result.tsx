@@ -3,11 +3,18 @@ import { Answer } from "../types";
 import { motion } from "framer-motion";
 import Layout from "../components/Layout";
 import { v4 as uuidv4 } from "uuid";
+import React from "react";
+import { BarChart, Bar, Cell, ResponsiveContainer } from "recharts";
+import { round } from "lodash";
 
 export default function Result() {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
   const hitNum = answerLog.filter((answer) => answer.is_correct).length;
-  const score = answerLog.reduce((sum, answer) => sum + (answer.is_correct ? 100 + (answer.time_remaining || 0) : 0), 0);
+  const score = answerLog.reduce(
+    (sum, answer) =>
+      sum + (answer.is_correct ? 100 + (answer.time_remaining || 0) : 0),
+    0
+  );
 
   useEffect(() => {
     // LocalStorageからスコアと回答履歴を取得
@@ -24,6 +31,66 @@ export default function Result() {
     localStorage.setItem("game_id", randomId);
     window.location.href = "/game";
   }
+
+  const scoreBin = Math.ceil(score / 100) / 10;
+  console.log(scoreBin);
+  const data = [
+    {
+      name: "0",
+      ratio: 0.01131221719,
+      color: "gray",
+    },
+    {
+      name: "0.1",
+      ratio: 0.03846153846,
+      color: "gray",
+    },
+    {
+      name: "0.2",
+      ratio: 0.04740406321,
+      color: "gray",
+    },
+    {
+      name: "0.3",
+      ratio: 0.06334841629,
+      color: "gray",
+    },
+    {
+      name: "0.4",
+      ratio: 0.1199095023,
+      color: "gray",
+    },
+    {
+      name: "0.5",
+      ratio: 0.1719457014,
+      color: "gray",
+    },
+    {
+      name: "0.6",
+      ratio: 0.149321267,
+      color: "gray",
+    },
+    {
+      name: "0.7",
+      ratio: 0.1606334842,
+      color: "gray",
+    },
+    {
+      name: "0.8",
+      ratio: 0.1199095023,
+      color: "gray",
+    },
+    {
+      name: "0.9",
+      ratio: 0.07239819005,
+      color: "gray",
+    },
+    {
+      name: "1.0",
+      ratio: 0.04524886878,
+      color: "gray",
+    },
+  ];
 
   if (answerLog.length === 0) {
     return (
@@ -52,19 +119,33 @@ export default function Result() {
             Your GitHub-Guessr score is{" "}
             <span className="font-extrabold text-4xl">
               {" " + score}
-              {score > 1000 ? (
-                "🎉🎉🎉"
-              ) : score >= 700 ? (
-                "🎉"
-              ) : score >= 400 ? (
-                "🙂"
-              ) : (
-                "😢"
-              )}
+              {score > 1000
+                ? "🎉🎉🎉"
+                : score >= 700
+                ? "🎉"
+                : score >= 400
+                ? "🙂"
+                : "😢"}
             </span>
           </span>
         </h1>
-        <p className="text-gray-700 mb-2 text-lg">
+        <div className="text-gray-500 w-full h-40">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart width={150} height={40} data={data}>
+              <Bar dataKey="ratio">
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={
+                      parseFloat(entry.name) <= scoreBin ? "#8884d8" : "gray"
+                    }
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="text-gray-700 mt-2 text-lg">
           You guessed {hitNum} repositories correctly!
         </p>
         <table className="table-auto border-collapse border border-indigo-500 my-6 break-words">
