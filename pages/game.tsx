@@ -284,7 +284,7 @@ export default function Game() {
             </p>
           </div>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
-            {answer ? "Your Answer is" : "You selected nothing"}
+            {answer ? `Your Answer is ${answer}` : "You selected nothing"}
           </p>
           <motion.button
             whileHover={{ scale: 1.06 }}
