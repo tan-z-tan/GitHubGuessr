@@ -132,6 +132,19 @@ export default function Game() {
         )}
       </div>
       <div className="relative w-full">
+        <div className="w-full flex justify-center">
+          <div className="absolute w-full mx-auto md:max-w-2xl">
+            <div
+              className={
+                "text-lg text-right font-bold mr-4 " +
+                (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")
+              }
+              style={{ top: "4%", right: "4%" }}
+            >
+              {secondsRemaining}s
+            </div>
+          </div>
+        </div>
         <motion.div
           animate={snipetControls}
           transition={{ ease: "easeInOut", delay: 0.3, duration: 0.5 }}
@@ -164,15 +177,6 @@ export default function Game() {
             </motion.pre>
           </div>
         </motion.div>
-        <div
-          className={
-            "absolute text-lg md:max-w-lg text-right font-bold mr-4 " +
-            (secondsRemaining < 10 ? "text-red-500" : "text-indigo-400")
-          }
-          style={{ top: "4%", right: "4%" }}
-        >
-          {secondsRemaining}s
-        </div>
       </div>
       <div className="relative w-5/6 md:max-w-xl">
         <motion.div
@@ -196,7 +200,9 @@ export default function Game() {
         </motion.div>
       </div>
       {/* 横並びに選択肢を表示する */}
-      <h3 className="text-white text-lg mt-4 mx-3">Choose the repository you guess</h3>
+      <h3 className="text-white text-lg mt-4 mx-3">
+        Choose the repository you guess
+      </h3>
       <div className="mt-1 flex flex-wrap justify-center md:max-w-xl">
         {currentQuestion?.candidates.map((candidate) => (
           <button
@@ -278,7 +284,7 @@ export default function Game() {
             </p>
           </div>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
-            Your Answer is [{answer}]
+            {answer ? "Your Answer is" : "You selected nothing"}
           </p>
           <motion.button
             whileHover={{ scale: 1.06 }}
