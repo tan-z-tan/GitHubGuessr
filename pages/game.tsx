@@ -7,7 +7,8 @@ export default function Game() {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(
     null
   );
-  const [answer, setAnswer] = useState("");
+  const [answer, setAnswer] = useState<string>("");  // this is for re-rendering component
+  const answerRef = useRef<string>("");  // this is for checking answer synchronously
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
   const [userId, setUserId] = useState("");
   const [gameId, setGameId] = useState("");
@@ -70,7 +71,7 @@ export default function Game() {
         setSecondsRemaining((prevSeconds) => {
           if (prevSeconds <= 1) {
             clearInterval(timerId);
-            checkAnswer();
+            checkAnswer(answerRef.current);
             return 60;
           }
           return prevSeconds - 1;
@@ -209,11 +210,14 @@ export default function Game() {
             key={candidate}
             className={
               "py-1.5 px-2 rounded-full m-1.5 " +
-              (answer == candidate
+              (answerRef.current == candidate
                 ? "bg-indigo-500 hover:bg-indigo-600 text-gray-100"
                 : "bg-gray-200 hover:bg-gray-300 text-gray-700")
             }
-            onClick={() => setAnswer(candidate)}
+            onClick={() => {
+              setAnswer(candidate);
+              answerRef.current = candidate; // ここで答えをrefにも保存
+            }}
           >
             {candidate}
           </button>
@@ -221,7 +225,7 @@ export default function Game() {
       </div>
       <button
         className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 ml-2 mt-4 rounded-full"
-        onClick={checkAnswer}
+        onClick={ () => checkAnswer(answerRef.current) }
         disabled={!answerable}
       >
         Guess!!
@@ -257,12 +261,12 @@ export default function Game() {
           <p
             className={
               "text-4xl font-extrabold leading-none tracking-tight my-6 " +
-              (answer == currentQuestion?.repository.name
+              (answerRef.current == currentQuestion?.repository.name
                 ? "text-green-500"
                 : "text-red-500")
             }
           >
-            {currentQuestion?.repository.name == answer
+            {currentQuestion?.repository.name == answerRef.current
               ? "Correct!🎉"
               : "Oops!😢"}
           </p>
@@ -284,7 +288,7 @@ export default function Game() {
             </p>
           </div>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
-            {answer ? `Your Answer is ${answer}` : "You selected nothing"}
+            {answerRef.current ? `Your Answer is ${answerRef.current}` : "You selected nothing"}
           </p>
           <motion.button
             whileHover={{ scale: 1.06 }}
@@ -299,15 +303,15 @@ export default function Game() {
     </div>
   );
 
-  async function checkAnswer() {
+  async function checkAnswer(userAnswer: string) {
     setAnswerable(false);
-    const isCorrect = answer == currentQuestion?.repository.name;
+    const isCorrect = userAnswer == currentQuestion?.repository.name;
     fetch("/api/send_answer", {
       method: "POST",
       body: JSON.stringify({
         user_id: userId,
         game_id: gameId,
-        user_answer: answer,
+        user_answer: userAnswer,
         round: questionIndex,
         correct_answer: currentQuestion?.repository.name || "",
         time_remaining: secondsRemaining,
@@ -324,7 +328,7 @@ export default function Game() {
       user_id: userId,
       repo_image_url: currentQuestion?.repository.avatarURL || "",
       repo_url: currentQuestion?.repository.url || "",
-      user_answer: answer,
+      user_answer: userAnswer,
       time_remaining: secondsRemaining,
       correct_answer: currentQuestion?.repository.name || "",
       is_correct: isCorrect,
@@ -352,6 +356,7 @@ export default function Game() {
     } else {
       setShowModal(false);
       setAnswer("");
+      answerRef.current = "";
       setQuestionIndex(questionIndex + 1);
     }
   }
