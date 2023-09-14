@@ -44,7 +44,7 @@ export type GameData = {
   roundNum: number;
   rounds: {
     repoName: string;
-    userAnswer: string;
+    userAnswer: string | null;
     timeRemaining: number;
     isCorrect: boolean;
   }[];

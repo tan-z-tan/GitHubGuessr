@@ -1,20 +1,21 @@
-import { useState, useEffect, use, useRef } from "react";
-import { Answer, QuestionData } from "../../../types";
+import { useState, useEffect, useRef } from "react";
+import { Answer, GameData, QuestionData } from "../../../types";
 import { motion, useAnimation } from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 
 export default function Game() {
   const router = useRouter();
   const { gameId } = router.query;
+  const [game, setGame] = useState<GameData | null>(null);
+
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(
     null
   );
-  const [answer, setAnswer] = useState<string>(""); // this is for re-rendering component
+  const [_, setAnswer] = useState<string>(""); // this is for re-rendering component
   const answerRef = useRef<string>(""); // this is for checking answer synchronously
-  const [answerLog, setAnswerLog] = useState<Answer[]>([]);
-  const [userId, setUserId] = useState("");
-  const [questionIndex, setQuestionIndex] = useState(0); // 現在の質問のインデックス
+  // const [answerLog, setAnswerLog] = useState<Answer[]>([]);
+  const [username, setUsername] = useState<string | null>(null);
+  // const [questionIndex, setQuestionIndex] = useState(0); // 現在の質問のインデックス
   const [snippetIndex, setSnippetIndex] = useState(0); // 現在のスニペットのインデックス
   const [showModal, setShowModal] = useState(false); // モーダルの表示フラグ
   const [answerable, setAnswerable] = useState(false); // 回答可能かどうか
@@ -27,41 +28,57 @@ export default function Game() {
   const dragAreaRef = useRef<HTMLPreElement>(null);
 
   useEffect(() => {
-    // Generate random user id by uuid v4
-    const existUserId = localStorage.getItem("user_id");
-    if (existUserId) {
-      setUserId(existUserId);
-    } else {
-      const randomId = uuidv4();
-      setUserId(randomId);
-      localStorage.setItem("user_id", randomId);
-    }
-  }, []);
-
-  useEffect(() => {
     if (!gameId) return;
 
-    const answerLog = JSON.parse(localStorage.getItem("answerLog") || "[]");
-    if (answerLog.length) {
-      setAnswerLog(answerLog);
-      setQuestionIndex(answerLog.length);
+    const existUsername = localStorage.getItem("username");
+    if (existUsername) {
+      setUsername(existUsername);
+    } else {
+      setUsername("");
     }
 
-    fetchQuestion();
-  }, [gameId, questionIndex]);
+    console.log("Fetching game", gameId);
+    fetch(`/api/game?gameId=${gameId}`).then(async (res) => {
+      if (!res.ok) {
+        alert("Failed to fetch game");
+        setGame(null);
+        return;
+      }
+
+      if (res.status === 404) {
+        setGame(null);
+        return;
+      }
+      const game = await res.json();
+      setGame(game);
+      fetchQuestion();
+    });
+  }, [gameId]);
+
+  async function updateGame() {
+    console.log("Updating game", gameId);
+    const response = await fetch(`/api/game?gameId=${gameId}`);
+    if (!response.ok) {
+      return;
+    }
+    const data: GameData = await response.json();
+    setGame(data);
+  }
 
   async function fetchQuestion() {
+    console.log("fetching question");
     const response = await fetch(`/api/question?game_id=${gameId}`);
     const data: QuestionData = await response.json();
     snipetControls.start({ scale: [0.1, 1] });
     snipetDragControls.start({ x: 0, y: 0 });
     setCurrentQuestion(data);
     setAnswerable(true);
+    updateGame();
   }
 
   useEffect(() => {
     if (currentQuestion) {
-      setSecondsRemaining(10);
+      setSecondsRemaining(60);
       const timerId = setInterval(() => {
         setSecondsRemaining((prevSeconds) => {
           if (prevSeconds <= 1) {
@@ -93,10 +110,14 @@ export default function Game() {
     };
   }
 
+  if (!game) {
+    return <></>;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-700">
       <h2 className="text-white text-2xl font-bold mb-4">
-        What is this repository? {questionIndex + 1}/{gameRound}
+        What is this repository? {game.rounds.length}/{gameRound}
       </h2>
       <div className="text-white text-md mb-2">
         <span className="font-bold">
@@ -226,24 +247,24 @@ export default function Game() {
         Guess!!
       </button>
       <div className="text-white text-lg mt-4 mx-3">
-        {answerLog.map((answer, index) => (
+        {game.rounds.map((round, index) => (
           <div key={index} className="mb-2">
             {index + 1}:
             <span
-              className={answer.is_correct ? "text-green-500" : "text-red-500"}
+              className={round.isCorrect ? "text-green-500" : "text-red-500"}
             >
-              {answer.is_correct ? " Correct! " : " Wrong. "}
+              {round.isCorrect ? " Correct! " : " Wrong. "}
             </span>
             <br />
             Correct answer{" "}
-            <img
-              src={answer.repo_image_url}
+            {/* <img
+              src={round.repoName}
               className="w-8 h-8"
               style={{ display: "inline-block" }}
-            />
-            [{answer.correct_answer}]
+            /> */}
+            [{round.repoName}]
             <br />
-            Your answer is [{answer.user_answer}]
+            Your answer is [{round.userAnswer}]
           </div>
         ))}
       </div>
@@ -293,7 +314,7 @@ export default function Game() {
             className="bg-indigo-400 hover:bg-indigo-500 text-white font-bold mt-6 py-2 px-4 rounded-full"
             onClick={goToNextQuestion}
           >
-            {questionIndex >= gameRound - 1 ? "Show Result" : "Next Round"}
+            {game.finished_at ? "Show Result" : "Next Round"}
           </motion.button>
         </motion.div>
       )}
@@ -305,7 +326,7 @@ export default function Game() {
     const sendRes = await fetch("/api/send_answer", {
       method: "POST",
       body: JSON.stringify({
-        user_id: userId,
+        user_id: username,
         game_id: gameId,
         user_answer: userAnswer,
         time_remaining: secondsRemaining,
@@ -316,17 +337,20 @@ export default function Game() {
     }).then((res) => res.json());
     setShowModal(true);
 
-    const isCorrect = sendRes.isCorrect;
+    const game = await fetch(`/api/game?gameId=${gameId}`).then((res) =>
+      res.json()
+    );
+    setGame(game);
 
     // LocalStorageに回答履歴を保存
     const currentLog: Answer = {
-      user_id: userId,
+      user_id: username || "",
       repo_image_url: currentQuestion?.repository.avatarURL || "",
       repo_url: currentQuestion?.repository.url || "",
       user_answer: userAnswer,
       time_remaining: secondsRemaining,
       correct_answer: currentQuestion?.repository.name || "",
-      is_correct: isCorrect,
+      is_correct: sendRes.isCorrect,
     };
     const existingLogs: Answer[] = JSON.parse(
       localStorage.getItem("answerLog") || "[]"
@@ -338,7 +362,7 @@ export default function Game() {
   }
 
   function goToNextQuestion() {
-    if (questionIndex >= gameRound - 1) {
+    if (game?.finished_at) {
       // スコアをLocalStorageに保存
       const existingLogs: Answer[] = JSON.parse(
         localStorage.getItem("answerLog") || "[]"
@@ -352,7 +376,7 @@ export default function Game() {
       setShowModal(false);
       setAnswer("");
       answerRef.current = "";
-      setQuestionIndex(questionIndex + 1);
+      fetchQuestion();
     }
   }
 }

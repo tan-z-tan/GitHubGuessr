@@ -184,7 +184,7 @@ export default function Result() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {round.userAnswer.replace("/", "/ ")}
+                    {round.userAnswer?.replace("/", "/ ")}
                   </a>
                 </td>
                 <td className="border border-indigo-500 px-2 py-1">

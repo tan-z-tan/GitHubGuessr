@@ -7,16 +7,16 @@ import firestore from "../../utils/firebaseAdmin";
 const QUIZ_NUM = 12;
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const gameId = req.query.game_id as string;
-  console.log("gameId", gameId);
   const game = await fetchGame(gameId);
   if (!game) {
     res.status(404).json({ message: "Game not found" });
     return;
   }
-  // if (game.finished_at) {
-  //   res.status(200).json({ message: "Game finished" });
-  //   return;
-  // }
+
+  if (game.rounds.length > 0 && game.rounds[game.rounds.length - 1].userAnswer === null) {
+    // already fetched question but not answered yet. Remove the last round.
+    game.rounds.pop();
+  }
 
   // Pick random repositories from githubPopularRepos
   const allRepos = filterUsedRepos(githubPopularRepos, game.rounds.map((round: any) => round.repository_id));
@@ -33,7 +33,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   game.rounds.push({
     repoName: targetRepo.name,
-    userAnswer: "",
+    userAnswer: null,
     isCorrect: false,
     timeRemaining: -1,
   });
