@@ -1,27 +1,52 @@
 import type { NextPage } from "next";
-import Head from "next/head";
-import { useEffect, useState } from "react";
+import { Modal, ModalContent } from "@nextui-org/react";
+
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Answer } from "../types";
 import Layout from "../components/Layout";
-import { v4 as uuidv4 } from "uuid";
 
 const Home: NextPage = () => {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
+  const [username, setUsername] = useState<string>("");
+  const [theme, setTheme] = useState<string>("all");
+  const [nameModalOpen, setNameModalOpen] = useState(false);
+  const usernameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const answerLog = JSON.parse(localStorage.getItem("answerLog") || "[]");
     if (answerLog.length) {
       setAnswerLog(answerLog);
     }
+    const savedUsername = localStorage.getItem("username");
+    if (savedUsername) {
+      setUsername(savedUsername);
+    }
   }, []);
 
-  function startGame() {
+  async function startGame() {
     // ゲーム開始時にanswerLogをリセット
+    if (username == "") {
+      setNameModalOpen(true);
+      return;
+    }
+
+    const res = await fetch("/api/start_game", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, theme }),
+    });
+    if (!res.ok) {
+      alert("Failed to start game");
+      return;
+    }
+
+    const { game_id } = await res.json();
     localStorage.removeItem("answerLog");
-    const randomId = uuidv4();
-    localStorage.setItem("game_id", randomId);
-    window.location.href = "/game";
+    localStorage.setItem("game_id", game_id);
+    window.location.href = `/games/${game_id}`;
   }
 
   return (
@@ -34,9 +59,14 @@ const Home: NextPage = () => {
         >
           GitHub-Guessr
         </h1>
-        <p className={"text-gray-400 mb-6 px-5"}>
+        <div className={"text-gray-400 mb-6 px-5"}>
           Can you guess the GitHub repository from the code?
-        </p>
+          {username.length > 0 && (
+            <p className={"text-gray-600 my-4 px-5 text-center"}>
+              Hello <span className="font-bold">{username}!</span>
+            </p>
+          )}
+        </div>
         <motion.button
           className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full"
           whileHover={{ scale: 1.06 }}
@@ -45,9 +75,11 @@ const Home: NextPage = () => {
         >
           Start Game
         </motion.button>
-        {answerLog.length > 0 /* 履歴があれば表示 */ && (
+        {answerLog.length > 0 && (
           <div>
-            <h2 className="text-black font-bold text-lg mt-12 mb-3 mx-3">Your previous score</h2>
+            <h2 className="text-black font-bold text-lg mt-12 mb-3 mx-3">
+              Your previous score
+            </h2>
             {answerLog.map((answer, index) => (
               <div key={index} className="mb-2 text-left">
                 {index + 1}:
@@ -64,11 +96,44 @@ const Home: NextPage = () => {
                   style={{ display: "inline-block" }}
                 />
                 [{answer.correct_answer}]
-                  </div>
+              </div>
             ))}
           </div>
         )}
       </main>
+      <Modal
+        isOpen={nameModalOpen}
+        onClose={() => setNameModalOpen(false)}
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80"
+      >
+        <ModalContent className="bg-white rounded-md p-4 border border-gray-300">
+          <>
+            <h2 className="text-black font-bold text-lg mt-12 mb-3 mx-3">
+              Your name?
+            </h2>
+            <input
+              className="border border-gray-300 rounded-md p-2 mb-4"
+              ref={usernameRef}
+            />
+            <motion.button
+              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full"
+              whileHover={{ scale: 1.06 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              onClick={() => {
+                localStorage.setItem(
+                  "username",
+                  usernameRef.current?.value || ""
+                );
+                setUsername(usernameRef.current?.value || "");
+                startGame();
+                setNameModalOpen(false);
+              }}
+            >
+              Start Game
+            </motion.button>
+          </>
+        </ModalContent>
+      </Modal>
     </Layout>
   );
 };

@@ -1,13 +1,27 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { QuestionData } from "../../types";
+import { GameData, QuestionData, Repository } from "../../types";
 import { githubPopularRepos } from "../../data/repo_with_snippets";
 import lodash from "lodash";
+import firestore from "../../utils/firebaseAdmin";
 
 const QUIZ_NUM = 12;
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const gameId = req.query.game_id as string;
+  console.log("gameId", gameId);
+  const game = await fetchGame(gameId);
+  if (!game) {
+    res.status(404).json({ message: "Game not found" });
+    return;
+  }
+  // if (game.finished_at) {
+  //   res.status(200).json({ message: "Game finished" });
+  //   return;
+  // }
+
   // Pick random repositories from githubPopularRepos
-  const randomRepos = lodash.sampleSize(
-    githubPopularRepos.filter((repo) => repo.snippets.length > 0),
+  const allRepos = filterUsedRepos(githubPopularRepos, game.rounds.map((round: any) => round.repository_id));
+  const randomRepos: Repository[] = lodash.sampleSize(
+    allRepos.filter((repo) => repo.snippets.length > 0),
     QUIZ_NUM
   );
   const targetRepo = randomRepos[0];
@@ -16,6 +30,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   var snippets = targetRepo.snippets.filter((snippet) => snippet.length > 32);
   snippets.sort(() => Math.random() - 0.5);
   snippets = snippets.slice(0, 5);
+
+  game.rounds.push({
+    repoName: targetRepo.name,
+    userAnswer: "",
+    isCorrect: false,
+    timeRemaining: -1,
+  });
+  await updateGame(gameId, game);
 
   const questionData: QuestionData = {
     repository: {
@@ -35,3 +57,24 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   res.status(200).json(questionData);
 };
+
+function filterUsedRepos(
+  repos: any[],
+  usedRepoNames: string[]
+) {
+  return repos.filter((repo) => {
+    return !usedRepoNames.includes(repo.name);
+  });
+}
+
+async function fetchGame(gameId: string): Promise<GameData> {
+  const game = await firestore.collection("games").doc(gameId).get();
+  if (!game.exists) {
+    throw new Error("Game not found");
+  }
+  return game.data() as GameData;
+}
+
+async function updateGame(gameId: string, game: any) {
+  await firestore.collection("games").doc(gameId).set(game);
+}
