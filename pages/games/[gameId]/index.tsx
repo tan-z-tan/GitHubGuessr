@@ -35,7 +35,6 @@ export default function Game() {
       setUsername("");
     }
 
-    console.log("Fetching game", gameId);
     fetch(`/api/game?gameId=${gameId}`).then(async (res) => {
       if (!res.ok) {
         alert("Failed to fetch game");
@@ -54,7 +53,6 @@ export default function Game() {
   }, [gameId]);
 
   async function updateGame() {
-    console.log("Updating game", gameId);
     const response = await fetch(`/api/game?gameId=${gameId}`);
     if (!response.ok) {
       return;
@@ -64,7 +62,6 @@ export default function Game() {
   }
 
   async function fetchQuestion() {
-    console.log("fetching question");
     const response = await fetch(`/api/question?game_id=${gameId}`);
     const data: QuestionData = await response.json();
     snipetControls.start({ scale: [0.1, 1] });
