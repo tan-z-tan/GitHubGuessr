@@ -104,19 +104,24 @@ const Home: NextPage = () => {
       <Modal
         isOpen={nameModalOpen}
         onClose={() => setNameModalOpen(false)}
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80"
+        backdrop="opaque"
+        radius="sm"
+        classNames={{
+          base: "text-gray-400 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
       >
-        <ModalContent className="bg-white rounded-md p-4 border border-gray-300">
+        <ModalContent className="bg-white rounded-md p-4 border border-gray-100 shadow-lg">
           <>
-            <h2 className="text-black font-bold text-lg mt-12 mb-3 mx-3">
-              Your name?
+            <h2 className="text-gray-600 font-bold text-lg mt-12 mb-3 mx-3">
+              Please enter your name
             </h2>
             <input
               className="border border-gray-300 rounded-md p-2 mb-4"
               ref={usernameRef}
             />
             <motion.button
-              className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full"
+              className="bg-indigo-500 hover:bg-indigo-700 text-white w-40 mx-auto font-bold py-2 px-4 rounded-full"
               whileHover={{ scale: 1.06 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
               onClick={() => {
