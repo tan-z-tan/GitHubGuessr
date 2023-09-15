@@ -19,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   // Pick random repositories from githubPopularRepos
-  const allRepos = filterUsedRepos(githubPopularRepos, game.rounds.map((round: any) => round.repository_id));
+  const allRepos = filterUsedRepos(githubPopularRepos, game.rounds.map((round: any) => round.repoName));
   const randomRepos: Repository[] = lodash.sampleSize(
     allRepos.filter((repo) => repo.snippets.length > 0),
     QUIZ_NUM
