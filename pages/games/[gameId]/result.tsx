@@ -126,7 +126,7 @@ export default function Result() {
     <Layout>
       <Head>
         <title>
-          {game.username}'s GitHub-Guessr score is {score}!
+          {game.username}{"'s"} GitHub-Guessr score is {score}!
         </title>
         <meta property="og:title" content="GitHub-Guessr" />
         <meta property="og:image" content={`/api/og?gameId=${gameId}`} />
