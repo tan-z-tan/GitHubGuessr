@@ -1,38 +1,47 @@
 import { useEffect, useState } from "react";
-import { Answer } from "../types";
+import { GameData } from "../../../types";
 import { motion } from "framer-motion";
-import Layout from "../components/Layout";
-import { v4 as uuidv4 } from "uuid";
+import Layout from "../../../components/Layout";
 import React from "react";
 import { BarChart, Bar, Cell, ResponsiveContainer } from "recharts";
-import { round } from "lodash";
+import { useRouter } from "next/router";
 
 export default function Result() {
-  const [answerLog, setAnswerLog] = useState<Answer[]>([]);
-  const hitNum = answerLog.filter((answer) => answer.is_correct).length;
-  const score = answerLog.reduce(
-    (sum, answer) =>
-      sum + (answer.is_correct ? 100 + (answer.time_remaining || 0) : 0),
-    0
-  );
+  const router = useRouter();
+  const { gameId } = router.query;
+  const [game, setGame] = useState<GameData | null>(null);
 
   useEffect(() => {
-    // LocalStorageからスコアと回答履歴を取得
-    const savedScore = localStorage.getItem("score");
-    const savedLog = JSON.parse(localStorage.getItem("answerLog") || "[]");
+    if (!gameId) return;
 
-    if (savedLog.length) setAnswerLog(savedLog);
-  }, []);
+    fetch(`/api/game?gameId=${gameId}`).then(async (res) => {
+      if (!res.ok) {
+        alert("Failed to fetch game");
+        setGame(null);
+        return;
+      }
 
-  function startGame() {
-    // ゲーム開始時にanswerLogをリセット
-    localStorage.removeItem("answerLog");
-    const randomId = uuidv4();
-    localStorage.setItem("game_id", randomId);
-    window.location.href = "/game";
+      if (res.status === 404) {
+        setGame(null);
+        return;
+      }
+      const game = await res.json();
+      setGame(game);
+    });
+  }, [gameId]);
+
+  function shareResult() {
+    const url = `https://github-guessr.vercel.app/games/${gameId}`;
+    const text = `My 😺GitHub-Guessr😺 score is ${game?.score}!\n`;
+    const hashtags = "GitHubGuessr";
+    const encodedUrl = encodeURIComponent(url);
+    const encodedText = encodeURIComponent(text);
+    const encodedHashtags = encodeURIComponent(hashtags);
+    const shareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}&hashtags=${encodedHashtags}`;
+    window.open(shareUrl, "_blank");
   }
 
-  if (answerLog.length === 0) {
+  if (game === null) {
     return (
       <Layout>
         <h1 className="text-3xl font-bold mb-4">No result found 🧐</h1>
@@ -51,7 +60,9 @@ export default function Result() {
       </Layout>
     );
   }
-  const scoreBin = Math.ceil((hitNum / answerLog.length) * 10) / 10;
+  const hitNum = game.correct_num;
+  const score = game.score;
+  const scoreBin = Math.ceil((hitNum / game.rounds.length) * 10) / 10;
   const data = [
     {
       name: "0",
@@ -114,8 +125,11 @@ export default function Result() {
     <Layout>
       <main className={"flex flex-col items-center justify-center flex-1 px-2"}>
         <h1 className="text-3xl font-bold mb-4 text-center">
+          Player{" "}
+          <span className="font-bold text-indigo-500">{game.username}{"'s"}</span>
+          <br />
+          GitHub-Guessr score is{" "}
           <span className="text-indigo-500 text-2xl">
-            Your GitHub-Guessr score is{" "}
             <span className="font-extrabold text-4xl">
               {" " + score}
               {score > 1000
@@ -159,26 +173,36 @@ export default function Result() {
             </tr>
           </thead>
           <tbody>
-            {answerLog.map((answer, index) => (
+            {game.rounds.map((round, index) => (
               <tr key={index}>
                 <td className="border border-indigo-500 px-2 py-1">
                   {index + 1}
                 </td>
                 <td className="border border-indigo-500 px-2 py-1">
-                  {answer.user_answer.replace("/", "/ ")}
+                  <a
+                    href={`https://github.com/${round.userAnswer}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {round.userAnswer?.replace("/", "/ ")}
+                  </a>
                 </td>
                 <td className="border border-indigo-500 px-2 py-1">
-                  <a href={answer.repo_url} target="_blank">
-                    {answer.correct_answer.replace("/", "/ ")}
+                  <a
+                    href={`https://github.com/${round.repoName}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {round.repoName.replace("/", "/ ")}
                   </a>
                 </td>
                 <td
                   className={
                     "border border-indigo-500 px-2 py-1" +
-                    (answer.is_correct ? " text-green-500" : " text-red-500")
+                    (round.isCorrect ? " text-green-500" : " text-red-500")
                   }
                 >
-                  {answer.is_correct ? "Correct" : "Wrong"}
+                  {round.isCorrect ? "Correct" : "Wrong"}
                 </td>
               </tr>
             ))}
@@ -188,9 +212,9 @@ export default function Result() {
           className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full mt-4"
           whileHover={{ scale: 1.06 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          onClick={startGame}
+          onClick={shareResult}
         >
-          Play Again
+          Share your score
         </motion.button>
         <motion.button
           className="bg-white border border-indigo-500

@@ -14,7 +14,7 @@ export type Repository = {
 export type Theme = {
   id: number;
   title: string;
-  difficulty: "easy" | "medium" | "hard"; // 難易度は列挙型で管理すると便利です
+  difficulty: "easy" | "medium" | "hard";
 };
 
 export type ThemeRepository = {
@@ -37,18 +37,19 @@ export type Answer = {
   is_correct: boolean;
 };
 
-export type Round = {
-  id: number;
-  currentQuestionIndex: number; // 現在の質問のインデックス
-  answers: Array<{
-    // 回答のログ。どのリポジトリに何と回答したかを保持
-    repository_id: string;
-    answer: boolean; // true: correct, false: wrong
-  }>;
-};
-
-export type User = {
-  id: string; // ユニークなユーザID
-  nickname: string;
-  currentRoundId?: number; // 現在進行中のラウンド。存在しない場合は未参加とみなす
+export type GameData = {
+  id: string;
+  username: string;
+  theme: string;
+  roundNum: number;
+  rounds: {
+    repoName: string;
+    userAnswer: string | null;
+    timeRemaining: number;
+    isCorrect: boolean;
+  }[];
+  correct_num: number;
+  correct_rate: number;
+  score: number;
+  finished_at: Date | null;
 };
