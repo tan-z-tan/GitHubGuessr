@@ -24,9 +24,9 @@ const Home: NextPage = () => {
     }
   }, []);
 
-  async function startGame() {
+  async function startGame(username?: string) {
     // ゲーム開始時にanswerLogをリセット
-    if (username == "") {
+    if (username === undefined || username === "") {
       setNameModalOpen(true);
       return;
     }
@@ -71,7 +71,7 @@ const Home: NextPage = () => {
           className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full"
           whileHover={{ scale: 1.06 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          onClick={() => startGame()}
+          onClick={() => startGame(username)}
         >
           Start Game
         </motion.button>
@@ -125,8 +125,8 @@ const Home: NextPage = () => {
                   usernameRef.current?.value || ""
                 );
                 setUsername(usernameRef.current?.value || "");
-                startGame();
                 setNameModalOpen(false);
+                startGame(usernameRef.current?.value || "");
               }}
             >
               Start Game
