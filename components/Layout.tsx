@@ -47,7 +47,7 @@ export default function Layout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <meta name="description" content={desc} />
-        <meta property="og:title" content={title} />
+        <meta property="og:title" content={title || "GitHub-Guessr"} />
         <meta property="og:type" content={isTopPage ? "website" : "website"} />
         <meta property="og:site_name" content={title || "GitHub-Guessr"} />
         <meta property="og:description" content={desc} />
