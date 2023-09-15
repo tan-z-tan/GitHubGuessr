@@ -49,6 +49,8 @@ export default function Layout({
         <meta property="og:type" content={isTopPage ? "website" : "website"} />
         <meta property="og:site_name" content={title || "GitHub-Guessr"} />
         <meta property="og:description" content={desc} />
+        <meta property="og:image" content="/api/og" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta httpEquiv="content-language" content={"en"} />
       </Head>
       {children}
