@@ -264,7 +264,9 @@ export default function Game() {
             /> */}
                 [{round.repoName}]
                 <br />
-                Your answer is [{round.userAnswer}]
+                {(round.userAnswer || "").length > 0
+                  ? `Your answer is ${round.userAnswer}}`
+                  : "You selected nothing"}
               </div>
             );
           })}
