@@ -7,10 +7,12 @@ export default function Layout({
   children,
   className,
   title,
+  ogImageUrl,
   description,
 }: PropsWithChildren<{
   className?: string;
   title?: string;
+  ogImageUrl?: string;
   description?: string;
 }>) {
   const router = useRouter();
@@ -49,7 +51,7 @@ export default function Layout({
         <meta property="og:type" content={isTopPage ? "website" : "website"} />
         <meta property="og:site_name" content={title || "GitHub-Guessr"} />
         <meta property="og:description" content={desc} />
-        <meta property="og:image" content="/api/og" />
+        <meta property="og:image" content={ogImageUrl || "/api/og"} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta httpEquiv="content-language" content={"en"} />
       </Head>

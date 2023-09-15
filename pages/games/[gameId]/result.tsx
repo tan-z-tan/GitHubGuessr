@@ -123,15 +123,7 @@ export default function Result() {
   ];
 
   return (
-    <Layout>
-      <Head>
-        <title>
-          {game.username}{"'s"} GitHub-Guessr score is {score}!
-        </title>
-        <meta property="og:title" content="GitHub-Guessr" />
-        <meta property="og:image" content={`/api/og?gameId=${gameId}`} />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
+    <Layout ogImageUrl={`/api/og?gameId=${gameId}`} title={`${game.username}'s GitHub-Guessr score is ${score}!`}>
       <main className={"flex flex-col items-center justify-center flex-1 px-2"}>
         <h1 className="text-3xl font-bold mb-4 text-center">
           Player{" "}
