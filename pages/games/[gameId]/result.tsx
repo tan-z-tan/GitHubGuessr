@@ -32,7 +32,7 @@ export default function Result() {
 
   function shareResult() {
     const url = `https://github-guessr.vercel.app/games/${gameId}`;
-    const text = `My GitHub-Guessr score is ${game?.score}!`;
+    const text = `My 😺GitHub-Guessr😺 score is ${game?.score}!\n`;
     const hashtags = "GitHubGuessr";
     const encodedUrl = encodeURIComponent(url);
     const encodedText = encodeURIComponent(text);
