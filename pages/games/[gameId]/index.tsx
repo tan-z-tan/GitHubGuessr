@@ -13,9 +13,7 @@ export default function Game() {
   );
   const [_, setAnswer] = useState<string>(""); // this is for re-rendering component
   const answerRef = useRef<string>(""); // this is for checking answer synchronously
-  // const [answerLog, setAnswerLog] = useState<Answer[]>([]);
   const [username, setUsername] = useState<string | null>(null);
-  // const [questionIndex, setQuestionIndex] = useState(0); // 現在の質問のインデックス
   const [snippetIndex, setSnippetIndex] = useState(0); // 現在のスニペットのインデックス
   const [showModal, setShowModal] = useState(false); // モーダルの表示フラグ
   const [answerable, setAnswerable] = useState(false); // 回答可能かどうか
