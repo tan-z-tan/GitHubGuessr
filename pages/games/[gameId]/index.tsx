@@ -245,26 +245,32 @@ export default function Game() {
         Guess!!
       </button>
       <div className="text-white text-lg mt-4 mx-3">
-        {game.rounds.map((round, index) => (
-          <div key={index} className="mb-2">
-            {index + 1}:
-            <span
-              className={round.isCorrect ? "text-green-500" : "text-red-500"}
-            >
-              {round.isCorrect ? " Correct! " : " Wrong. "}
-            </span>
-            <br />
-            Correct answer{" "}
-            {/* <img
+        {game.rounds
+          .filter((round) => round.userAnswer != null)
+          .map((round, index) => {
+            return (
+              <div key={index} className="mb-2">
+                {index + 1}:
+                <span
+                  className={
+                    round.isCorrect ? "text-green-500" : "text-red-500"
+                  }
+                >
+                  {round.isCorrect ? " Correct! " : " Wrong. "}
+                </span>
+                <br />
+                Correct answer{" "}
+                {/* <img
               src={round.repoName}
               className="w-8 h-8"
               style={{ display: "inline-block" }}
             /> */}
-            [{round.repoName}]
-            <br />
-            Your answer is [{round.userAnswer}]
-          </div>
-        ))}
+                [{round.repoName}]
+                <br />
+                Your answer is [{round.userAnswer}]
+              </div>
+            );
+          })}
       </div>
       {showModal && (
         <motion.div
@@ -303,7 +309,7 @@ export default function Game() {
           </div>
           <p className="text-4xl font-bold leading-none tracking-tight text-gray-200 mb-6">
             {answerRef.current
-              ? `Your Answer is ${answerRef.current}`
+              ? `Your answer is ${answerRef.current}`
               : "You selected nothing"}
           </p>
           <motion.button
