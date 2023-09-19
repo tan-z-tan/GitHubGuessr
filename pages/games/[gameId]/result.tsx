@@ -98,6 +98,7 @@ export default function Result({ game }: { game: GameData | null }) {
 
   return (
     <Layout
+      ogUrl={`${process.env.SERVERHOST}/games/${game.id}/result`}
       ogImageUrl={`${process.env.SERVERHOST}/api/og?gameId=${game.id}`}
       title={`${game.username}'s GitHub-Guessr score is ${score}!`}
     >
