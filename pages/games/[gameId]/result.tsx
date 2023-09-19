@@ -98,7 +98,7 @@ export default function Result({ game }: { game: GameData | null }) {
 
   return (
     <Layout
-      ogImageUrl={`/api/og?gameId=${game.id}`}
+      ogImageUrl={`${process.env.SERVERHOST}/api/og?gameId=${game.id}`}
       title={`${game.username}'s GitHub-Guessr score is ${score}!`}
     >
       <main className={"flex flex-col items-center justify-center flex-1 px-2"}>
