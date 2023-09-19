@@ -56,6 +56,7 @@ export default function Layout({
         <meta property="og:description" content={desc} />
         <meta property="og:image" content={ogImageUrl || "/api/og"} />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@tan_z_tan" />
         <meta httpEquiv="content-language" content={"en"} />
       </Head>
       {children}
