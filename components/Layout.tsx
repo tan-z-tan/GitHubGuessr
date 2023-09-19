@@ -7,11 +7,13 @@ export default function Layout({
   children,
   className,
   title,
+  ogUrl,
   ogImageUrl,
   description,
 }: PropsWithChildren<{
   className?: string;
   title?: string;
+  ogUrl?: string;
   ogImageUrl?: string;
   description?: string;
 }>) {
@@ -50,9 +52,11 @@ export default function Layout({
         <meta property="og:title" content={title || "GitHub-Guessr"} />
         <meta property="og:type" content={isTopPage ? "website" : "website"} />
         <meta property="og:site_name" content={title || "GitHub-Guessr"} />
+        <meta property="og:url" content={ogUrl || `${process.env.SERVERHOST}`} />
         <meta property="og:description" content={desc} />
         <meta property="og:image" content={ogImageUrl || "/api/og"} />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@tan_z_tan" />
         <meta httpEquiv="content-language" content={"en"} />
       </Head>
       {children}
