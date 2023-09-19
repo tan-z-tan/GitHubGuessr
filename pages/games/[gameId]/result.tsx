@@ -10,7 +10,7 @@ import Head from "next/head";
 export default function Result() {
   const router = useRouter();
   const { gameId } = router.query;
-  const [game, setGame] = useState<GameData | null>(null);
+  const [game, setGame] = useState<GameData | undefined | null>(undefined);
 
   useEffect(() => {
     if (!gameId) return;
@@ -40,6 +40,9 @@ export default function Result() {
     const encodedHashtags = encodeURIComponent(hashtags);
     const shareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}&hashtags=${encodedHashtags}`;
     window.open(shareUrl, "_blank");
+  }
+  if (game === undefined) {
+    return <></>;
   }
 
   if (game === null) {
