@@ -6,7 +6,7 @@ import { BarChart, Bar, Cell, ResponsiveContainer } from "recharts";
 
 export default function Result({ game }: { game: GameData | null }) {
   function shareResult() {
-    const url = `https://github-guessr.vercel.app/games/${game?.id}`;
+    const url = `https://github-guessr.vercel.app/games/${game?.id}/result`;
     const text = `My 😺GitHub-Guessr😺 score is ${game?.score}!\n`;
     const hashtags = "GitHubGuessr";
     const encodedUrl = encodeURIComponent(url);
