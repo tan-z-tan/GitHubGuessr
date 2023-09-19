@@ -42,12 +42,12 @@ export default function Result() {
     window.open(shareUrl, "_blank");
   }
   if (game === undefined) {
-    return <></>;
+    return <Layout ogImageUrl={`/api/og?gameId=${gameId}`} />;
   }
 
   if (game === null) {
     return (
-      <Layout>
+      <Layout ogImageUrl={`/api/og?gameId=${gameId}`}>
         <h1 className="text-3xl font-bold mb-4">No result found 🧐</h1>
         <h2 className="text-4xl font-extrabold leading-none tracking-tight text-gray-600 mt-6 mb-4">
           GitHub-Guessr
