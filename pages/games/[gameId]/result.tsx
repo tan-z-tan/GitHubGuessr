@@ -1,38 +1,12 @@
-import { useEffect, useState } from "react";
 import { GameData } from "../../../types";
 import { motion } from "framer-motion";
 import Layout from "../../../components/Layout";
 import React from "react";
 import { BarChart, Bar, Cell, ResponsiveContainer } from "recharts";
-import { useRouter } from "next/router";
-import Head from "next/head";
 
-export default function Result() {
-  const router = useRouter();
-  const { gameId } = router.query;
-  const [game, setGame] = useState<GameData | undefined | null>(undefined);
-
-  useEffect(() => {
-    if (!gameId) return;
-
-    fetch(`/api/game?gameId=${gameId}`).then(async (res) => {
-      if (!res.ok) {
-        alert("Failed to fetch game");
-        setGame(null);
-        return;
-      }
-
-      if (res.status === 404) {
-        setGame(null);
-        return;
-      }
-      const game = await res.json();
-      setGame(game);
-    });
-  }, [gameId]);
-
+export default function Result({ game }: { game: GameData | null }) {
   function shareResult() {
-    const url = `https://github-guessr.vercel.app/games/${gameId}`;
+    const url = `https://github-guessr.vercel.app/games/${game?.id}`;
     const text = `My 😺GitHub-Guessr😺 score is ${game?.score}!\n`;
     const hashtags = "GitHubGuessr";
     const encodedUrl = encodeURIComponent(url);
@@ -41,13 +15,10 @@ export default function Result() {
     const shareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}&hashtags=${encodedHashtags}`;
     window.open(shareUrl, "_blank");
   }
-  if (game === undefined) {
-    return <Layout ogImageUrl={`/api/og?gameId=${gameId}`} />;
-  }
 
   if (game === null) {
     return (
-      <Layout ogImageUrl={`/api/og?gameId=${gameId}`}>
+      <Layout>
         <h1 className="text-3xl font-bold mb-4">No result found 🧐</h1>
         <h2 className="text-4xl font-extrabold leading-none tracking-tight text-gray-600 mt-6 mb-4">
           GitHub-Guessr
@@ -127,7 +98,7 @@ export default function Result() {
 
   return (
     <Layout
-      ogImageUrl={`/api/og?gameId=${gameId}`}
+      ogImageUrl={`/api/og?gameId=${game.id}`}
       title={`${game.username}'s GitHub-Guessr score is ${score}!`}
     >
       <main className={"flex flex-col items-center justify-center flex-1 px-2"}>
@@ -239,3 +210,37 @@ export default function Result() {
     </Layout>
   );
 }
+
+export const getServerSideProps = async (context: any) => {
+  const gameId = context.params.gameId;
+  const protocol = context.req.headers['x-forwarded-proto'] || 'http';
+  const host = context.req.headers.host;
+  const baseUrl = `${protocol}://${host}`;
+
+  if (!gameId) {
+    return {
+      props: {
+        gameId: null,
+      },
+    };
+  }
+
+  const game: GameData = await fetch(`${baseUrl}/api/game?gameId=${gameId}`).then(
+    async (res) => {
+      if (!res.ok) {
+        return null;
+      }
+      if (res.status === 404) {
+        return null;
+      }
+      const game = await res.json();
+      return game;
+    }
+  );
+
+  return {
+    props: {
+      game: game,
+    },
+  };
+};
