@@ -126,11 +126,17 @@ export default function Result() {
   ];
 
   return (
-    <Layout ogImageUrl={`/api/og?gameId=${gameId}`} title={`${game.username}'s GitHub-Guessr score is ${score}!`}>
+    <Layout
+      ogImageUrl={`/api/og?gameId=${gameId}`}
+      title={`${game.username}'s GitHub-Guessr score is ${score}!`}
+    >
       <main className={"flex flex-col items-center justify-center flex-1 px-2"}>
         <h1 className="text-3xl font-bold mb-4 text-center">
           Player{" "}
-          <span className="font-bold text-indigo-500">{game.username}{"'s"}</span>
+          <span className="font-bold text-indigo-500">
+            {game.username}
+            {"'s"}
+          </span>
           <br />
           GitHub-Guessr score is{" "}
           <span className="text-indigo-500 text-2xl">
