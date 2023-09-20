@@ -51,6 +51,8 @@ export default function About() {
             <a
               href="https://docs.google.com/forms/d/e/1FAIpQLSfk8ny1V01X3CZkfOZBjO28tpj866M___QjBtQLSAAXSgBnGA/viewform?usp=sf_link"
               className="text-indigo-500 hover:text-indigo-500"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Contact form
             </a>
