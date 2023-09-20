@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 
@@ -67,7 +68,7 @@ export default function Layout({
         <span className="font-extrabold">
           <a href="/">GitHub-Guessr</a>
         </span>
-        <a
+        <Link
           className="ml-3 text-gray-600 hover:text-gray-500"
           href="https://github.com/tan-z-tan/GitHubGuessr"
           target="_blank"
@@ -79,7 +80,7 @@ export default function Layout({
             style={{ marginTop: "-4px" }}
           />
           Code
-        </a>
+        </Link>
       </footer>
     </motion.div>
   );

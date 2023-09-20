@@ -22,11 +22,10 @@ export default function About() {
             GitHub-Guessr is a game designed for engineers where the challenge
             is to identify GitHub repositories based on code snippets.
             <br />
-            In the coding world today, we're constantly mashing up a bunch of
-            open-source libraries and frameworks. But we rarely look at the code
-            behind them. With GitHub-Guessr, you can explore and learn, in a
-            game format, how famous libraries are coded and what languages are
-            used. It can also be a good test of your engineering skills.
+            In today&apos;s coding world, we often use many open-source
+            libraries without looking at their code. With GitHub-Guessr, you can
+            play a game to learn how popular libraries are made and which
+            languages they use. It's also a fun way to test your skills.
           </p>
           <h2 className="text-2xl text-gray-600 font-bold my-4 text-center">
             How to play
