@@ -61,7 +61,9 @@ export default function Layout({
       </Head>
       {children}
       <footer className="flex items-center justify-center w-full h-12 border-t text-gray-500 text-xl mt-6">
-        <span className="font-extrabold">GitHub-Guessr</span>
+        <span className="font-extrabold">
+          <a href="/">GitHub-Guessr</a>
+        </span>
         <a
           className="ml-3 text-gray-600 hover:text-gray-500"
           href="https://github.com/tan-z-tan/GitHubGuessr"
