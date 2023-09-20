@@ -52,7 +52,10 @@ export default function Layout({
         <meta property="og:title" content={title || "GitHub-Guessr"} />
         <meta property="og:type" content={isTopPage ? "website" : "website"} />
         <meta property="og:site_name" content={title || "GitHub-Guessr"} />
-        <meta property="og:url" content={ogUrl || `${process.env.SERVERHOST}`} />
+        <meta
+          property="og:url"
+          content={ogUrl || `${process.env.SERVERHOST}`}
+        />
         <meta property="og:description" content={desc} />
         <meta property="og:image" content={ogImageUrl || "/api/og"} />
         <meta name="twitter:card" content="summary_large_image" />
