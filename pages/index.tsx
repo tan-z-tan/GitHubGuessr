@@ -51,7 +51,7 @@ const Home: NextPage = () => {
 
   return (
     <Layout>
-      <main className={"flex flex-col items-center justify-center flex-1"}>
+      <main className={"relative flex flex-col items-center justify-center flex-1"}>
         <h1
           className={
             "text-4xl font-extrabold leading-none tracking-tight text-gray-600 mb-4"
@@ -100,6 +100,14 @@ const Home: NextPage = () => {
             ))}
           </div>
         )}
+        <div className="absolute bottom-0 mb-2 text-gray-400">
+          <a
+            href="about"
+            className="text-gray-500 hover:text-gray-600"
+          >
+            What is GitHub-Guessr?
+          </a>
+        </div>
       </main>
       <Modal
         isOpen={nameModalOpen}

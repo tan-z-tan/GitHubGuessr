@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 
@@ -52,7 +53,10 @@ export default function Layout({
         <meta property="og:title" content={title || "GitHub-Guessr"} />
         <meta property="og:type" content={isTopPage ? "website" : "website"} />
         <meta property="og:site_name" content={title || "GitHub-Guessr"} />
-        <meta property="og:url" content={ogUrl || `${process.env.SERVERHOST}`} />
+        <meta
+          property="og:url"
+          content={ogUrl || `${process.env.SERVERHOST}`}
+        />
         <meta property="og:description" content={desc} />
         <meta property="og:image" content={ogImageUrl || "/api/og"} />
         <meta name="twitter:card" content="summary_large_image" />
@@ -61,8 +65,10 @@ export default function Layout({
       </Head>
       {children}
       <footer className="flex items-center justify-center w-full h-12 border-t text-gray-500 text-xl mt-6">
-        <span className="font-extrabold">GitHub-Guessr</span>
-        <a
+        <span className="font-extrabold">
+          <Link href="/">GitHub-Guessr</Link>
+        </span>
+        <Link
           className="ml-3 text-gray-600 hover:text-gray-500"
           href="https://github.com/tan-z-tan/GitHubGuessr"
           target="_blank"
@@ -74,7 +80,7 @@ export default function Layout({
             style={{ marginTop: "-4px" }}
           />
           Code
-        </a>
+        </Link>
       </footer>
     </motion.div>
   );
