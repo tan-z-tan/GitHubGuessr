@@ -25,7 +25,7 @@ export default function About() {
             In today&apos;s coding world, we often use many open-source
             libraries without looking at their code. With GitHub-Guessr, you can
             play a game to learn how popular libraries are made and which
-            languages they use. It's also a fun way to test your skills.
+            languages they use. Ity&apos;s also a fun way to test your skills.
           </p>
           <h2 className="text-2xl text-gray-600 font-bold my-4 text-center">
             How to play
