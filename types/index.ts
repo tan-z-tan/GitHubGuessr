@@ -1,3 +1,5 @@
+export type Language = 'Python' | 'Go' | 'TypeScript' | 'C' | 'Java';
+
 export type Repository = {
   updatedAt: Date;
   org: string;
@@ -52,4 +54,5 @@ export type GameData = {
   correct_rate: number;
   score: number;
   finished_at: Date | null;
+  language?: Language;
 };

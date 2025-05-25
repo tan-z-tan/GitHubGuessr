@@ -46,7 +46,7 @@ export const githubPopularRepos = [
   },
   {
     name: "electron/electron",
-    lang: "C++, JavaScript",
+    lang: "C, JavaScript",
     desc: "Build cross-platform desktop apps with JavaScript, HTML, and CSS.",
   },
   {
@@ -172,7 +172,7 @@ export const githubPopularRepos = [
   },
   {
     name: "bitcoin/bitcoin",
-    lang: "C++",
+    lang: "C",
     desc: "Bitcoin Core integration/staging tree.",
   },
   {
@@ -205,7 +205,7 @@ export const githubPopularRepos = [
     lang: "Java",
     desc: "Open Source, Distributed, RESTful Search Engine.",
   },
-  { name: "mongodb/mongo", lang: "C++", desc: "The MongoDB Database." },
+  { name: "mongodb/mongo", lang: "C", desc: "The MongoDB Database." },
   {
     name: "grafana/grafana",
     lang: "Go, TypeScript",
@@ -258,7 +258,7 @@ export const githubPopularRepos = [
   },
   {
     name: "rollup/rollup",
-    lang: "JavaScript, TypeScript",
+    lang: "TypeScript",
     desc: "Next-generation ES module bundler.",
   },
   {
@@ -283,7 +283,7 @@ export const githubPopularRepos = [
   },
   {
     name: "microsoft/terminal",
-    lang: "C++",
+    lang: "C",
     desc: "The new Windows Terminal and the original Windows console host, all in the same place!",
   },
   {
@@ -303,7 +303,7 @@ export const githubPopularRepos = [
   },
   {
     name: "pytorch/pytorch",
-    lang: "C++, Python",
+    lang: "C, Python",
     desc: "Tensors and Dynamic neural networks in Python with strong GPU acceleration.",
   },
   {
@@ -343,7 +343,7 @@ export const githubPopularRepos = [
   },
   {
     name: "llvm/llvm-project",
-    lang: "C++",
+    lang: "C",
     desc: "The LLVM Project is a collection of modular and reusable compiler and toolchain technologies.",
   },
   {

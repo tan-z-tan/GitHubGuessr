@@ -3,13 +3,32 @@ import { Modal, ModalContent } from "@nextui-org/react";
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Answer } from "../types";
+import { Answer, Language } from "../types"; // Imported Language
 import Layout from "../components/Layout";
+
+const languages: Language[] = ['Python', 'Go', 'TypeScript', 'C', 'Java'];
+
+const languageDescriptions: Record<Language, string> = {
+  Python: "Guess repositories written primarily in Python.",
+  Go: "Guess repositories written primarily in Go.",
+  TypeScript: "Guess repositories written primarily in TypeScript.",
+  C: "Guess repositories written primarily in C.",
+  Java: "Guess repositories written primarily in Java.",
+};
+
+const languageIcons: Record<Language, string> = {
+  Python: "/icons/python.svg",
+  Go: "/icons/go.svg",
+  TypeScript: "/icons/typescript.svg",
+  C: "/icons/c.svg",
+  Java: "/icons/java.svg",
+};
 
 const Home: NextPage = () => {
   const [answerLog, setAnswerLog] = useState<Answer[]>([]);
   const [username, setUsername] = useState<string>("");
-  const [theme, setTheme] = useState<string>("all");
+  // const [theme, setTheme] = useState<string>("all"); // Theme will be determined in startGame
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null); // Added selectedLanguage state
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const usernameRef = useRef<HTMLInputElement>(null);
 
@@ -24,11 +43,21 @@ const Home: NextPage = () => {
     }
   }, []);
 
-  async function startGame(username?: string) {
-    // ゲーム開始時にanswerLogをリセット
+  async function startGame(username?: string, language?: Language | null) { // Added language parameter
     if (username === undefined || username === "") {
       setNameModalOpen(true);
       return;
+    }
+
+    const currentTheme = language ? language : "all"; // Determine theme based on language
+
+    const requestBody: { username: string; theme: string; language?: Language } = { // Added language to body type
+      username,
+      theme: currentTheme,
+    };
+
+    if (language) {
+      requestBody.language = language;
     }
 
     const res = await fetch("/api/start_game", {
@@ -36,7 +65,7 @@ const Home: NextPage = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, theme }),
+      body: JSON.stringify(requestBody), // Send language in body
     });
     if (!res.ok) {
       alert("Failed to start game");
@@ -75,9 +104,39 @@ const Home: NextPage = () => {
         >
           Start Game
         </motion.button>
+
+        {/* Language Selection UI */}
+        <div className="mt-10 w-full max-w-md px-5">
+          <h2 className="text-xl font-semibold text-gray-600 mb-4 text-center">
+            Or, play in a specific language mode:
+          </h2>
+          <div className="space-y-4">
+            {languages.map((lang) => (
+              <div key={lang} className="p-4 border rounded-lg shadow-sm bg-white">
+                <div className="flex items-center mb-2">
+                  <img src={languageIcons[lang]} alt={`${lang} icon`} className="w-6 h-6 mr-2" />
+                  <h3 className="text-lg font-medium text-gray-700">{lang} Mode</h3>
+                </div>
+                <p className="text-sm text-gray-500 mb-3">{languageDescriptions[lang]}</p>
+                <motion.button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full w-full"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  onClick={() => {
+                    setSelectedLanguage(lang); // Set selected language state
+                    startGame(username, lang);
+                  }}
+                >
+                  Start {lang} Game
+                </motion.button>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {answerLog.length > 0 && (
-          <div>
-            <h2 className="text-black font-bold text-lg mt-12 mb-3 mx-3">
+          <div className="mt-12"> {/* Added margin-top for spacing */}
+            <h2 className="text-black font-bold text-lg mb-3 mx-3">
               Your previous score
             </h2>
             {answerLog.map((answer, index) => (
@@ -133,13 +192,16 @@ const Home: NextPage = () => {
               whileHover={{ scale: 1.06 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
               onClick={() => {
+                const currentUsername = usernameRef.current?.value || "";
                 localStorage.setItem(
                   "username",
-                  usernameRef.current?.value || ""
+                  currentUsername
                 );
-                setUsername(usernameRef.current?.value || "");
+                setUsername(currentUsername);
                 setNameModalOpen(false);
-                startGame(usernameRef.current?.value || "");
+                // For the modal, we assume it's a general game start, not language specific
+                // Or, we could add language selection to the modal too, but that's out of scope for now.
+                startGame(currentUsername);
               }}
             >
               Start Game
