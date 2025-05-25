@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { GameData, QuestionData, Repository } from "../../types";
+import { GameData, QuestionData, Repository, Language } from "../../types"; // Imported Language
 import { githubPopularRepos } from "../../data/repo_with_snippets";
 import lodash from "lodash";
 import firestore from "../../utils/firebaseAdmin";
@@ -13,13 +13,24 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
+  const gameLanguage = game.language; // Retrieve game language
+  let reposForSelection = githubPopularRepos;
+
+  if (gameLanguage) {
+    reposForSelection = githubPopularRepos.filter(repo => {
+      if (!repo.lang) return false; // Should not happen with current data, but good practice
+      const repoLangs = repo.lang.split(',').map(l => l.trim());
+      return repoLangs.includes(gameLanguage);
+    });
+  }
+
   if (game.rounds.length > 0 && game.rounds[game.rounds.length - 1].userAnswer === null) {
     // already fetched question but not answered yet. Remove the last round.
     game.rounds.pop();
   }
 
-  // Pick random repositories from githubPopularRepos
-  const allRepos = filterUsedRepos(githubPopularRepos, game.rounds.map((round: any) => round.repoName));
+  // Pick random repositories from the (potentially filtered) reposForSelection
+  const allRepos = filterUsedRepos(reposForSelection, game.rounds.map((round: any) => round.repoName));
   const randomRepos: Repository[] = lodash.sampleSize(
     allRepos.filter((repo) => repo.snippets.length > 0),
     QUIZ_NUM

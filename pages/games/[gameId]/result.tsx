@@ -124,25 +124,29 @@ export default function Result({ game }: { game: GameData | null }) {
             </span>
           </span>
         </h1>
-        <div className="text-gray-500 w-full h-40">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart width={150} height={40} data={data}>
-              <Bar dataKey="ratio">
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={
-                      parseFloat(entry.name) <= scoreBin ? "#8884d8" : "#bbb"
-                    }
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <p className="text-gray-700 mt-2 text-lg">
-          You guessed {hitNum} repositories correctly!
-        </p>
+        {!game.language && ( // Conditionally render statistics
+          <>
+            <div className="text-gray-500 w-full h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart width={150} height={40} data={data}>
+                  <Bar dataKey="ratio">
+                    {data.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          parseFloat(entry.name) <= scoreBin ? "#8884d8" : "#bbb"
+                        }
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-gray-700 mt-2 text-lg">
+              You guessed {hitNum} repositories correctly!
+            </p>
+          </>
+        )}
         <table className="table-auto border-collapse border border-indigo-500 my-6 break-words">
           <thead className="text-gray-500">
             <tr>
